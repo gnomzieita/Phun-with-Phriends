@@ -17,6 +17,11 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [[UIDevice currentDevice] setValue:
+     [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft]
+                                forKey:@"orientation"];
+    
     // Do any additional setup after loading the view.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(gameInitNotification)
@@ -36,6 +41,10 @@
     [self presentViewController:viewController animated:YES completion:^{
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }];
+}
+
+- (BOOL)shouldAutorotate {
+    return NO;
 }
 
 @end

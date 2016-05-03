@@ -48,9 +48,11 @@ typedef NS_ENUM(NSInteger, GameCardType) {
 
 @interface GameCardView : UIView
 
+@property (assign, nonatomic) BOOL isRotatingCard;
 @property (assign, nonatomic) GameCardType cardType;
 @property (assign, nonatomic) NSInteger rotate;
 @property (assign, nonatomic) NSInteger startRoad;
+@property (assign, nonatomic) UIColor* roadColor;
 
 - (instancetype)initInPoint:(CGPoint)point WithHeight:(CGFloat)kubHeight WithType:(GameCardType)cType;
 - (void)setType:(GameCardType)cType startRoad:(NSInteger)startRoad rotate:(NSInteger)rotate;

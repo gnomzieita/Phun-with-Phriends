@@ -16,5 +16,6 @@
 
 @interface WCScanViewController : UIViewController
 
+- (void)startStopReading;
 
 @end

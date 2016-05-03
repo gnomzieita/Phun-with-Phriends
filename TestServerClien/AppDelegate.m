@@ -19,6 +19,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     //NSLog(@"IP: %@",[[API sharedController] getIPAddress]);
+    [[UIApplication sharedApplication] setIdleTimerDisabled:YES];
     return YES;
 }
 

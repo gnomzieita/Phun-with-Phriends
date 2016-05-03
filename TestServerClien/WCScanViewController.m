@@ -11,6 +11,7 @@
 #import "API.h"
 #import "ServerInfoObject.h"
 #import "WaitStartViewController.h"
+#import "AdminViewController.h"
 
 @interface WCScanViewController () <AVCaptureMetadataOutputObjectsDelegate,WCScanViewControllerDelegat,UIAlertViewDelegate>
 {
@@ -23,8 +24,6 @@
 
 @property (weak, nonatomic) IBOutlet UIView *viewPreview;
 
-@property (weak, nonatomic) IBOutlet UISegmentedControl *fonarState;
-- (IBAction)Fonar:(id)sender;
 
 @end
 
@@ -38,8 +37,12 @@
 {
     [super viewDidLoad];
     
+    [[UIDevice currentDevice] setValue:
+     [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
+                                forKey:@"orientation"];
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(gameInitNotification)
+                                             selector:@selector(gameInitNotification:)
                                                  name:@"gameInit"
                                                object:nil];
     
@@ -57,13 +60,24 @@
     [self startStopReading];
 }
 
--(void) gameInitNotification
+-(void) gameInitNotification:(NSNotification *) notification
 {
-    WaitStartViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"WaitStartViewController"];
-
-    [self presentViewController:viewController animated:YES completion:^{
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-    }];
+    if ([[[notification userInfo] objectForKey:@"admin"] boolValue])
+    {
+        AdminViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AdminViewController"];
+        
+        [self presentViewController:viewController animated:YES completion:^{
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+        }];
+    }
+    else
+    {
+        WaitStartViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"WaitStartViewController"];
+        
+        [self presentViewController:viewController animated:YES completion:^{
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+        }];
+    }
 }
 - (void)didReceiveMemoryWarning
 {
@@ -100,15 +114,15 @@
         
         [captureDevice lockForConfiguration:nil];
         
-        if (_fonarState.selectedSegmentIndex == 1) {
-            [captureDevice setTorchMode:AVCaptureTorchModeOn];
-            [captureDevice setFlashMode:AVCaptureFlashModeOn];
-        }
-        else
-        {
-            [captureDevice setTorchMode:AVCaptureTorchModeOff];
-            [captureDevice setFlashMode:AVCaptureFlashModeOff];
-        }
+//        if (_fonarState.selectedSegmentIndex == 1) {
+//            [captureDevice setTorchMode:AVCaptureTorchModeOn];
+//            [captureDevice setFlashMode:AVCaptureFlashModeOn];
+//        }
+//        else
+//        {
+//            [captureDevice setTorchMode:AVCaptureTorchModeOff];
+//            [captureDevice setFlashMode:AVCaptureFlashModeOff];
+//        }
         
         [captureDevice unlockForConfiguration];
     }
@@ -140,6 +154,17 @@
     // Initialize the video preview layer and add it as a sublayer to the viewPreview view's layer.
     _videoPreviewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:_captureSession];
     [_videoPreviewLayer setVideoGravity:AVLayerVideoGravityResizeAspectFill];
+    _videoPreviewLayer.frame = self.view.bounds; // Assume you want the preview layer to fill the view.
+    
+    [_videoPreviewLayer setPosition:CGPointMake(0,0)];
+    
+    if (UIDeviceOrientationLandscapeLeft == [[UIDevice currentDevice] orientation]) {
+        _videoPreviewLayer.transform = CATransform3DMakeRotation(-M_PI/2, 0, 0, 1);
+    }
+    else if (UIDeviceOrientationLandscapeRight == [[UIDevice currentDevice] orientation])
+    {
+        _videoPreviewLayer.transform = CATransform3DMakeRotation(M_PI/2, 0, 0, 1);
+    }
     [_videoPreviewLayer setFrame:_viewPreview.layer.bounds];
     [_viewPreview.layer addSublayer:_videoPreviewLayer];
     
@@ -239,6 +264,11 @@
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     [self startStopReading];
+}
+
+
+- (BOOL)shouldAutorotate {
+    return NO;
 }
 
 @end

@@ -28,5 +28,20 @@
 
 - (void) initConnectWithServerInfo:(ServerInfoObject*)serverInfo;
 
+- (void) selectCell:(NSInteger)cellnum path:(NSInteger)path;
+
 - (NSString *)getIPAddress;
+
+-(void) sendCard:(NSInteger)cardNum angle:(NSInteger)angle;
+
+- (NSDictionary*) jsonStringToDictionary:(NSString*)jsonString;
+
+- (void) setUserName:(NSString*)userName;
+
+- (void) showErrorMessage:(NSString*)errorString;
+
+- (void) sendMessage:(NSString*)message;
+
+- (NSString*) objectToJSONString:(id)obj;
+
 @end

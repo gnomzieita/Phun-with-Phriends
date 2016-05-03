@@ -33,7 +33,8 @@
 
 - (void)setType:(GameCardType)cType startRoad:(NSInteger)startRoad rotate:(NSInteger)rotate
 {
-    _rotate = (rotate<0?8+rotate:rotate)%9;
+    [self setNeedsDisplay];
+    _rotate = rotate;
     _startRoad = startRoad;
     
     _cardTable = @{[NSNumber numberWithInteger:1]:@[@"2",@"1",@"4",@"3",@"6",@"5",@"8",@"7"],
@@ -73,32 +74,41 @@
                    [NSNumber numberWithInteger:35]:@[@"5",@"3",@"2",@"8",@"1",@"7",@"6",@"4"]};
     
     _cardType = cType;
+    self.layer.masksToBounds = YES;
     self.layer.borderColor = [UIColor blackColor].CGColor;
     self.layer.borderWidth = 1;
     [self setBackgroundColor:[UIColor whiteColor]];
+    if (_isRotatingCard) {
+        self.layer.cornerRadius = self.frame.size.width/4;
+        [self setBackgroundColor:[UIColor yellowColor]];
+    }
     [self drawRect:self.frame];
 
 }
 
 - (void)drawRect:(CGRect)rect {
     // Drawing code
-    
-    _kubHeight = rect.size.height;
-    _kubStep = _kubHeight/3;
-    
-    NSMutableArray* tempDict = [NSMutableArray array];
-    NSArray* numArray = [_cardTable objectForKey:[NSNumber numberWithInteger:_cardType]];
-    
-    [tempDict addObject:@"1"];
-    
-    for (int i = 0; i<8; i++) {
-        if (![tempDict containsObject:[NSString stringWithFormat:@"%i",i]] && ![tempDict containsObject:[numArray objectAtIndex:i]]) {
-            [tempDict addObject:[numArray objectAtIndex:i]];
-            NSInteger moveIn = ((i+1+_rotate*2)%8)+1;
-            NSInteger moveTo = (([[numArray objectAtIndex:i] integerValue]+_rotate*2)%8)+1;
+    if (_cardTable) {
+        _kubHeight = rect.size.height;
+        _kubStep = _kubHeight/3;
+        
+        //NSMutableArray* tempDict = [NSMutableArray array];
+        NSArray* numArray = [_cardTable objectForKey:[NSNumber numberWithInteger:_cardType]];
+        
+        //[tempDict addObject:@"1"];
+        
+        for (int i = 1; i<9; i++) {
+            NSInteger moveIn = (i+_rotate*2)>8?(i+_rotate*2)%8:(i+_rotate*2);
+            NSInteger moveTo = ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)>8?([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)%8: ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2);
+            NSLog(@"%i -> %i",moveIn,moveTo);
             [self moveIn:moveIn toPoint:moveTo];
-            
-            
+//            if (![tempDict containsObject:[NSString stringWithFormat:@"%i",moveIn]] && ![tempDict containsObject:[NSString stringWithFormat:@"%i",moveTo]]) {
+//                [tempDict addObject:[NSString stringWithFormat:@"%i",moveIn]];
+//                [tempDict addObject:[NSString stringWithFormat:@"%i",moveTo]];
+//                [self moveIn:moveIn toPoint:moveTo];
+//                
+//                
+//            }
         }
     }
     
@@ -791,13 +801,79 @@
     }
     
     if (inPoint == _startRoad || toPoint == _startRoad) {
-        CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+        if (_roadColor) {
+            CGContextSetFillColorWithColor(context, _roadColor.CGColor);
+        }
+        else
+        {
+            CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+        }
         NSLog(@"redColor");
+        float x = 0;
+        float y = 0;
+        switch (_startRoad) {
+            case 1:
+            {
+                x=1;
+            }
+                break;
+            case 2:
+            {
+                x=2;
+            }
+                break;
+            case 3:
+            {
+                x=3;
+                y=1;
+            }
+                break;
+            case 4:
+            {
+                x=3;
+                y=2;
+            }
+                break;
+            case 5:
+            {
+                x=2;
+                y=3;
+            }
+                break;
+            case 6:
+            {
+                x=1;
+                y=3;
+            }
+                break;
+            case 7:
+            {
+                y=2;
+            }
+                break;
+            case 8:
+            {
+                y=1;
+            }
+                break;
+                
+            default:
+                break;
+        }
+        CGPathMoveToPoint(path, NULL, _kubStep*x, _kubStep*y);
+        CGPathAddArc(path, NULL, _kubStep*x, _kubStep*y, 5.f, -M_PI_2, M_PI_2*3, NO);
+
     }
     else
     {
+//        if (_isRotatingCard) {
+//            CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+//        }
+//        else
+//        {
+//            CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
+//        }
         CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
-        NSLog(@"whiteColor");
     }
     
     CGPathRef thickPath = CGPathCreateCopyByStrokingPath(path, NULL, 4, kCGLineCapButt, kCGLineJoinBevel, 0);

@@ -2,7 +2,7 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:TestServerClien.xcodeproj">
+      location = "group:/Volumes/HDD_All/Xcode/Phun-with-Phriends/Phunky Phreeways.xcodeproj">
    </FileRef>
    <FileRef
       location = "group:Pods/Pods.xcodeproj">

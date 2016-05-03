@@ -10,4 +10,6 @@
 
 @interface GameViewController : UIViewController
 
+@property (strong, nonatomic) NSArray* cardArray;
+
 @end
