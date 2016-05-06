@@ -8,6 +8,7 @@
 
 #import "WaitStartViewController.h"
 #import "SelectStartCellViewController.h"
+#import "AdminViewController.h"
 
 @interface WaitStartViewController ()
 
@@ -27,11 +28,28 @@
                                              selector:@selector(gameInitNotification)
                                                  name:@"gameStart"
                                                object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(gameInitNotif:)
+                                                 name:@"gameInit"
+                                               object:nil];
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void) gameInitNotif:(NSNotification *) notification
+{
+    if ([[[notification userInfo] objectForKey:@"admin"] boolValue])
+    {
+        AdminViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AdminViewController"];
+        
+        [self presentViewController:viewController animated:YES completion:^{
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+        }];
+    }
 }
 
 -(void) gameInitNotification

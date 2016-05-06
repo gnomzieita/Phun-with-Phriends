@@ -37,6 +37,7 @@
 - (IBAction)button_3_tap:(id)sender;
 - (IBAction)button_4_tap:(id)sender;
 - (IBAction)button_5_tap:(id)sender;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *anim;
 
 @end
 
@@ -44,9 +45,10 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [_anim startAnimating];
     myAPI = [API sharedController];
-    _h_b_2.constant = 0;
-    _height_b_2.constant = 0;
+    [self hideShowButton];
+
     
     game_type = 0;
     [_button_1 setTitle:@"Классическая" forState:UIControlStateNormal];
@@ -86,13 +88,15 @@
 
 - (void) hideShowButton
 {
-    if (_h_b_2.constant == 0) {
+    if (_h_b_2.constant == 0 && game_type == 2) {
         _h_b_2.constant = 13;
         _height_b_2.constant = 30;
     }
     else
     {
         [UIView animateWithDuration:1 animations:^{
+            
+            [_button_2 setTitle:@"" forState:UIControlStateNormal];
             _h_b_2.constant = 0;
             _height_b_2.constant = 0;
         }];
@@ -123,7 +127,7 @@
     NSMutableDictionary* dict = [NSMutableDictionary dictionary];
     /*
      {
-     {"response":"start",
+     {"command":"start",
      ”game_type”:0,
      ”card_type”:0,
      ”user_shuffle”:true,
@@ -133,7 +137,7 @@
      }
      */
     
-    [dict setObject:@"start" forKey:@"response"];
+    [dict setObject:@"start" forKey:@"command"];
     
     [dict setObject:[NSNumber numberWithInteger:game_type] forKey:@"game_type"];
     [dict setObject:[NSNumber numberWithInteger:card_type] forKey:@"card_type"];
@@ -152,15 +156,17 @@
      game_type = 2 – гараж (если выбран то обязательный параметр parking_count принимает int в диапазоне 0 – 15)
      */
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите тип игры:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"Классическая" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"Классическая" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self hideShowButton];
         game_type = 0;
         [_button_1 setTitle:@"Классическая" forState:UIControlStateNormal];
     }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"Дистанция" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"Дистанция" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self hideShowButton];
         game_type = 1;
         [_button_1 setTitle:@"Дистанция" forState:UIControlStateNormal];
     }];
-    UIAlertAction* garag = [UIAlertAction actionWithTitle:@"Гараж" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* garag = [UIAlertAction actionWithTitle:@"Гараж" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         game_type = 2;
         [self hideShowButton];
         [_button_1 setTitle:@"Гараж" forState:UIControlStateNormal];
@@ -178,7 +184,7 @@
     //parking_count принимает int в диапазоне 0 – 15
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите количество гаражей:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     for (int i = 0 ; i<16; i++) {
-        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [_button_2 setTitle:[NSString stringWithFormat:@"%i",i] forState:UIControlStateNormal];
             parking_count = i;
         }];
@@ -196,11 +202,11 @@
      card_type = 1 – 3 карты
      */
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Как роздать карты:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"вся колода" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"вся колода" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [_button_3 setTitle:@"вся колода" forState:UIControlStateNormal];
         card_type = 0;
     }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"3 карты" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"3 карты" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [_button_3 setTitle:@"3 карты" forState:UIControlStateNormal];
         card_type = 1;
     }];
@@ -218,7 +224,7 @@
      */
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите количество карт которые будут вращаться:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     for (int i = 0 ; i<36; i++) {
-        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
             [_button_4 setTitle:[NSString stringWithFormat:@"%i",i] forState:UIControlStateNormal];
             rotate_count = i;
         }];
@@ -236,11 +242,11 @@
      
      */
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Как вращать карты:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"по часовой" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"по часовой" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [_button_5 setTitle:@"по часовой" forState:UIControlStateNormal];
         rotate_vector = 0;
     }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"против часовой стрелки" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"против часовой стрелки" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [_button_5 setTitle:@"против часовой стрелки" forState:UIControlStateNormal];
         rotate_vector = 1;
     }];

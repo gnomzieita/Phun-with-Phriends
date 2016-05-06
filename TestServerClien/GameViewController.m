@@ -109,8 +109,10 @@ alpha:1.0]
     
     UIAlertAction* actionButtonOk = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
-        //[[[[self presentingViewController] presentingViewController] presentingViewController] dismissViewControllerAnimated:YES completion:nil];
-        [self dismissViewControllerAnimated:YES completion:nil];
+        [[UIDevice currentDevice] setValue:
+         [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
+                                    forKey:@"orientation"];
+        [[[[[self presentingViewController] presentingViewController] presentingViewController] presentingViewController] dismissViewControllerAnimated:YES completion:nil];
     }];
     
     [alertController addAction:actionButtonOk];

@@ -90,7 +90,7 @@
                                                                    message:@"Откуда вы хотите начать?"
                                                             preferredStyle:UIAlertControllerStyleActionSheet]; // 1
     UIAlertAction *firstAction = [UIAlertAction actionWithTitle:@"Начать с 1"
-                                                          style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
+                                                          style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {
                                                               NSInteger doorNum = tapButton.tag<7?1:(tapButton.tag<13?3:(tapButton.tag<19?5:7));
                                                               [myAPI selectCell:tapButton.tag path:doorNum];
                                                           }]; // 2

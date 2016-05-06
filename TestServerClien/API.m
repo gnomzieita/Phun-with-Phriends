@@ -465,7 +465,7 @@ static API *_sharedController = nil;
 {
 
     NSDictionary* responseDict = [self jsonStringToDictionary:message];
-//    NSLog(@"messageReceived: %@",message);
+    NSLog(@"messageReceived: %@",message);
 //     NSLog(@"responseDict: %@",responseDict);
     if ([[responseDict objectForKey:@"response"] isEqualToString:@"init"])
     {
@@ -475,20 +475,25 @@ static API *_sharedController = nil;
         if (![responseDict objectForKey:@"error"])
         {
             token = [responseDict objectForKey:@"token"];
-            [userDef setObject:token forKey:@"token"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gameInit" object:self userInfo:responseDict];
         }
         else
         {
-            [self showErrorMessage:[responseDict objectForKey:@"error"]];
+            [self showErrorMessage:[responseDict objectForKey:@"error"] handler:nil];
         }
     }
     else if ([[responseDict objectForKey:@"response"] isEqualToString:@"start"])
     {
         /*{"admin":false,"response":"start"}*/
-        
-        
-        [[NSNotificationCenter defaultCenter] postNotificationName:@"gameStart" object:self];
+        if (![responseDict objectForKey:@"error"]) {
+            [userDef setObject:token forKey:@"token"];
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"gameStart" object:self];
+        }
+        else
+        {
+            [self showErrorMessage:[responseDict objectForKey:@"error"] handler:nil];
+        }
     }
     else if ([[responseDict objectForKey:@"response"] isEqualToString:@"action"])
     {

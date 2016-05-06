@@ -918,6 +918,7 @@
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
                     <connections>
+                        <outlet property="anim" destination="5zU-ia-pX6" id="SrD-oB-Yl2"/>
                         <outlet property="button_1" destination="hfA-dV-R7m" id="kJ2-zD-4Gh"/>
                         <outlet property="button_2" destination="D5J-nb-16o" id="Lfb-MU-RXR"/>
                         <outlet property="button_3" destination="UHR-G1-m6R" id="e8l-ML-Qzd"/>
