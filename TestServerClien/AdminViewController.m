@@ -9,34 +9,31 @@
 #import "AdminViewController.h"
 #import "SelectStartCellViewController.h"
 #import "API.h"
+#import "AdminCollectionViewCell.h"
 
-@interface AdminViewController ()
+#import "AdminCollectionViewCell.h"
+#import "Admin2CollectionViewCell.h"
+#import "AdminCell3CollectionViewCell.h"
+#import "SettingsProtocol.h"
+
+
+@interface AdminViewController ()<UICollectionViewDataSource, SettingsProtocol>
 {
     NSInteger game_type;
     NSInteger parking_count;
     NSInteger card_type;
     NSInteger rotate_count;
     NSInteger rotate_vector;
+    NSInteger user_shuffle;
+    
     API* myAPI;
 }
+@property (weak, nonatomic) IBOutlet UICollectionView *table;
 
-@property (weak, nonatomic) IBOutlet UIButton *button_1;
-@property (weak, nonatomic) IBOutlet UIButton *button_2;
-@property (weak, nonatomic) IBOutlet UIButton *button_3;
-@property (weak, nonatomic) IBOutlet UIButton *button_4;
-@property (weak, nonatomic) IBOutlet UIButton *button_5;
-
-@property (weak, nonatomic) IBOutlet UISwitch *swich;
-@property (weak, nonatomic) IBOutlet UIButton *startButton;
 - (IBAction)startButtonTap:(id)sender;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *h_b_2;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *height_b_2;
 
-- (IBAction)button_1_tap:(id)sender;
-- (IBAction)button_2_tap:(id)sender;
-- (IBAction)button_3_tap:(id)sender;
-- (IBAction)button_4_tap:(id)sender;
-- (IBAction)button_5_tap:(id)sender;
+- (IBAction)backTap:(id)sender;
+
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *anim;
 
 @end
@@ -47,17 +44,18 @@
     [super viewDidLoad];
     [_anim startAnimating];
     myAPI = [API sharedController];
-    [self hideShowButton];
+    //[self hideShowButton];
 
     
+    
     game_type = 0;
-    [_button_1 setTitle:@"Классическая" forState:UIControlStateNormal];
+    //[_button_1 setTitle:NSLocalizedString(@"game_type_klasik",@"Классическая") forState:UIControlStateNormal];
 
-    [_button_3 setTitle:@"вся колода" forState:UIControlStateNormal];
+    //[_button_3 setTitle:NSLocalizedString(@"game_type_koloda",@"вся колода") forState:UIControlStateNormal];
     card_type = 0;
-    [_button_4 setTitle:@"0" forState:UIControlStateNormal];
+    //[_button_4 setTitle:@"0" forState:UIControlStateNormal];
     rotate_count = 0;
-    [_button_5 setTitle:@"по часовой" forState:UIControlStateNormal];
+    //[_button_5 setTitle:NSLocalizedString(@"po_chasovoi",@"по часовой") forState:UIControlStateNormal];
     rotate_vector = 0;
     
     [[UIDevice currentDevice] setValue:
@@ -69,7 +67,13 @@
                                              selector:@selector(gameInitNotification)
                                                  name:@"gameStart"
                                                object:nil];
-    _startButton.layer.cornerRadius = 10.f;
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(settings_sync:)
+                                                 name:@"settings_sync"
+                                               object:nil];
+    [self startButtonTap:nil];
+   // _startButton.layer.cornerRadius = 10.f;
 }
 
 - (void)didReceiveMemoryWarning {
@@ -77,6 +81,20 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+-(void) settings_sync:(NSNotification *) notification
+{
+    NSDictionary* syncDict = [NSDictionary dictionaryWithDictionary:[notification userInfo]];
+    game_type = [[syncDict objectForKey:@"game_type"] integerValue];
+    card_type = [[syncDict objectForKey:@"card_type"] integerValue];
+    rotate_count = [[syncDict objectForKey:@"rotate_count"] integerValue];
+    rotate_vector = [[syncDict objectForKey:@"rotate_vector"] integerValue];
+    user_shuffle = [[syncDict objectForKey:@"user_shuffle"] boolValue];
+    parking_count = [[syncDict objectForKey:@"parking_count"] integerValue];
+    
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"settings_sync_cell" object:self userInfo:syncDict];
+}
+    
 -(void) gameInitNotification
 {
     SelectStartCellViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"SelectStartCellViewController"];
@@ -86,41 +104,9 @@
     }];
 }
 
-- (void) hideShowButton
-{
-    if (_h_b_2.constant == 0 && game_type == 2) {
-        _h_b_2.constant = 13;
-        _height_b_2.constant = 30;
-    }
-    else
-    {
-        [UIView animateWithDuration:1 animations:^{
-            
-            [_button_2 setTitle:@"" forState:UIControlStateNormal];
-            _h_b_2.constant = 0;
-            _height_b_2.constant = 0;
-        }];
-    }
-}
-
 - (BOOL)shouldAutorotate {
     return NO;
 }
-
-
-
-/*
- user_shuffle = false – игроки расставлены по порядку подключения
- user_shuffle = true – перемешиваются
- */
-/*
- rotate_count = 0 – принимает int в диапазоне 0 – 35
- */
-/*
- rotate_vector = 0 – по часовой, 1 – против часовой стрелки
-
- */
-
 
 - (IBAction)startButtonTap:(id)sender
 {
@@ -141,119 +127,158 @@
     
     [dict setObject:[NSNumber numberWithInteger:game_type] forKey:@"game_type"];
     [dict setObject:[NSNumber numberWithInteger:card_type] forKey:@"card_type"];
-    [dict setObject:[NSNumber numberWithBool:_swich.isOn] forKey:@"user_shuffle"];
+    [dict setObject:[NSNumber numberWithBool:user_shuffle] forKey:@"user_shuffle"];
+    [dict setObject:[NSNumber numberWithInteger:rotate_count] forKey:@"rotate_count"];
+    [dict setObject:[NSNumber numberWithInteger:rotate_vector] forKey:@"rotate_vector"];
+    [dict setObject:[NSNumber numberWithInteger:parking_count] forKey:@"parking_count"];
+    [myAPI sendMessage:[myAPI objectToJSONString:dict] ];
+}
+
+- (IBAction)backTap:(id)sender
+{
+    [myAPI popToTop:^{
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+    }];
+}
+
+#pragma mark - UICollectionViewDataSource
+
+- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
+{
+    return 4;
+}
+
+- (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    switch (indexPath.row) {
+        case 0:
+        {
+            AdminCollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AdminCollectionViewCell" forIndexPath:indexPath];
+            
+            [cell initCell];
+            [cell setDelegat:self];
+            return  cell;
+        }
+            break;
+        case 1:
+        {
+            Admin2CollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Admin2CollectionViewCell" forIndexPath:indexPath];
+            
+            
+            [cell initCell];
+            [cell setDelegat:self];
+            return  cell;
+        }
+            break;
+        case 2:
+        {
+            AdminCell3CollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AdminCell3CollectionViewCell" forIndexPath:indexPath];
+            
+            [cell initCell];
+            [cell setDelegat:self];
+            return  cell;
+        }
+            break;
+            
+        case 3:
+        {
+            AdminCell3CollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"AdminCell4CollectionViewCell" forIndexPath:indexPath];
+            
+            [cell initCell];
+            [cell setDelegat:self];
+            return  cell;
+        }
+            break;
+            
+        default:
+            break;
+    }
+    
+    
+    return  nil;
+}
+
+- (void) setGame_type:(NSInteger)type
+{
+    game_type = type;
+    [self settings_sync];
+}
+- (void) setParking_count:(NSInteger)count
+{
+    parking_count = count;
+    [self settings_sync];
+}
+- (void) setCard_type:(NSInteger)type
+{
+    card_type = type;
+    [self settings_sync];
+}
+- (void) setRotate_count:(NSInteger)count
+{
+    rotate_count = count;
+    [self settings_sync];
+}
+- (void) setRotate_vector:(NSInteger)vector
+{
+    rotate_vector = vector;
+    [self settings_sync];
+}
+
+- (NSInteger) getGame_type
+{
+    return game_type;
+}
+- (NSInteger) getParking_count
+{
+    return parking_count;
+}
+- (NSInteger) getCard_type
+{
+    return card_type;
+}
+- (NSInteger) getRotate_count
+{
+    return rotate_count;
+}
+- (NSInteger) getRotate_vector
+{
+    return rotate_vector;
+}
+
+- (void) setUser_shuffle:(BOOL)shuffle
+{
+    user_shuffle = shuffle;
+    [self settings_sync];
+}
+
+- (BOOL) getUser_shuffle
+{
+    return user_shuffle;
+}
+
+- (void) settings_sync
+{
+    NSMutableDictionary* dict = [NSMutableDictionary dictionary];
+    /*
+     {
+     {"command":"start",
+     ”game_type”:0,
+     ”card_type”:0,
+     ”user_shuffle”:true,
+     "rotate_count":0,
+     "rotate_vector":0
+     }
+     }
+     */
+    
+    [dict setObject:@"settings_sync" forKey:@"command"];
+    
+    [dict setObject:[NSNumber numberWithInteger:game_type] forKey:@"game_type"];
+    [dict setObject:[NSNumber numberWithInteger:card_type] forKey:@"card_type"];
+    [dict setObject:[NSNumber numberWithBool:user_shuffle] forKey:@"user_shuffle"];
     [dict setObject:[NSNumber numberWithInteger:rotate_count] forKey:@"rotate_count"];
     [dict setObject:[NSNumber numberWithInteger:rotate_vector] forKey:@"rotate_vector"];
     
-    [myAPI sendMessage:[myAPI objectToJSONString:dict]];
-    
-}
-- (IBAction)button_1_tap:(id)sender
-{
-    /*
-     game_type = 0 – классическая
-     game_type = 1 – дистанция
-     game_type = 2 – гараж (если выбран то обязательный параметр parking_count принимает int в диапазоне 0 – 15)
-     */
-    UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите тип игры:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"Классическая" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self hideShowButton];
-        game_type = 0;
-        [_button_1 setTitle:@"Классическая" forState:UIControlStateNormal];
-    }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"Дистанция" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [self hideShowButton];
-        game_type = 1;
-        [_button_1 setTitle:@"Дистанция" forState:UIControlStateNormal];
-    }];
-    UIAlertAction* garag = [UIAlertAction actionWithTitle:@"Гараж" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        game_type = 2;
-        [self hideShowButton];
-        [_button_1 setTitle:@"Гараж" forState:UIControlStateNormal];
-        [_button_2 setTitle:@"0" forState:UIControlStateNormal];
-    }];
-    [alertControl addAction:clasik];
-    [alertControl addAction:dist];
-    [alertControl addAction:garag];
-    
-    [self presentViewController:alertControl animated:YES completion:nil];
-}
-
-- (IBAction)button_2_tap:(id)sender
-{
-    //parking_count принимает int в диапазоне 0 – 15
-    UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите количество гаражей:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    for (int i = 0 ; i<16; i++) {
-        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [_button_2 setTitle:[NSString stringWithFormat:@"%i",i] forState:UIControlStateNormal];
-            parking_count = i;
-        }];
-        
-        [alertControl addAction:alert];
-    }
-    
-    [self presentViewController:alertControl animated:YES completion:nil];
-}
-
-- (IBAction)button_3_tap:(id)sender
-{
-    /*
-     card_type = 0 – вся колода
-     card_type = 1 – 3 карты
-     */
-    UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Как роздать карты:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"вся колода" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [_button_3 setTitle:@"вся колода" forState:UIControlStateNormal];
-        card_type = 0;
-    }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"3 карты" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [_button_3 setTitle:@"3 карты" forState:UIControlStateNormal];
-        card_type = 1;
-    }];
-
-    [alertControl addAction:clasik];
-    [alertControl addAction:dist];
-    
-    [self presentViewController:alertControl animated:YES completion:nil];
-}
-
-- (IBAction)button_4_tap:(id)sender
-{
-    /*
-     rotate_count = 0 – принимает int в диапазоне 0 – 35
-     */
-    UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Выберите количество карт которые будут вращаться:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    for (int i = 0 ; i<36; i++) {
-        UIAlertAction* alert = [UIAlertAction actionWithTitle:[NSString stringWithFormat:@"%i",i] style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-            [_button_4 setTitle:[NSString stringWithFormat:@"%i",i] forState:UIControlStateNormal];
-            rotate_count = i;
-        }];
-        
-        [alertControl addAction:alert];
-    }
-    
-    [self presentViewController:alertControl animated:YES completion:nil];
-}
-
-- (IBAction)button_5_tap:(id)sender
-{
-    /*
-     rotate_vector = 0 – по часовой, 1 – против часовой стрелки
-     
-     */
-    UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Как вращать карты:" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    UIAlertAction* clasik = [UIAlertAction actionWithTitle:@"по часовой" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [_button_5 setTitle:@"по часовой" forState:UIControlStateNormal];
-        rotate_vector = 0;
-    }];
-    UIAlertAction* dist = [UIAlertAction actionWithTitle:@"против часовой стрелки" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
-        [_button_5 setTitle:@"против часовой стрелки" forState:UIControlStateNormal];
-        rotate_vector = 1;
-    }];
-    
-    [alertControl addAction:clasik];
-    [alertControl addAction:dist];
-    
-    [self presentViewController:alertControl animated:YES completion:nil];
+    [myAPI sendMessage:[myAPI objectToJSONString:dict] ];
 }
 @end

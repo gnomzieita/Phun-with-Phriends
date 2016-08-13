@@ -59,10 +59,10 @@
 - (void) gameError
 {
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Error!"
-                                                                   message:@"Данный путь занят"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Ошибка!",@"Ошибка!")
+                                                                   message:NSLocalizedString(@"Данный путь занят",@"Данный путь занят")
                                                             preferredStyle:UIAlertControllerStyleAlert]; // 1
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:@"Ясно и понятно))"
+    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Ясно и понятно))",@"Ясно и понятно))")
                                                           style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {
                 
                                                           }]; // 2
@@ -86,15 +86,15 @@
 {
     tapButton = (UIButton*)sender;
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Выбор стартовой точки."
-                                                                   message:@"Откуда вы хотите начать?"
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Выбор стартовой точки.",@"Выбор стартовой точки.")
+                                                                   message:NSLocalizedString(@"Откуда вы хотите начать?",@"Откуда вы хотите начать?")
                                                             preferredStyle:UIAlertControllerStyleActionSheet]; // 1
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:@"Начать с 1"
+    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Начать с 1",@"Начать с 1")
                                                           style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {
                                                               NSInteger doorNum = tapButton.tag<7?1:(tapButton.tag<13?3:(tapButton.tag<19?5:7));
                                                               [myAPI selectCell:tapButton.tag path:doorNum];
                                                           }]; // 2
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:@"Начать с 2"
+    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Начать с 2",@"Начать с 2")
                                                            style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
                                                                NSInteger doorNum = tapButton.tag<7?2:(tapButton.tag<13?4:(tapButton.tag<19?6:8));
                                                                [myAPI selectCell:tapButton.tag path:doorNum];

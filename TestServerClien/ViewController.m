@@ -10,11 +10,16 @@
 #import "GameCardView.h"
 #import "GameViewController.h"
 #import "WCScanViewController.h"
+#import <Chartboost/Chartboost.h>
+#import "SettingsViewController.h"
 
 @interface ViewController ()
 
 @property (strong, nonatomic) API* myAPI;
 
+@property (weak, nonatomic) IBOutlet UIButton *startButton;
+@property (weak, nonatomic) IBOutlet UIButton *enteripButton;
+@property (weak, nonatomic) IBOutlet UIButton *settingsButton;
 @property (weak, nonatomic) IBOutlet UITextField *nikPole;
 
 
@@ -28,6 +33,51 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
     
+    if (![[NSUserDefaults standardUserDefaults] objectForKey:@"userName"]) {
+        SettingsViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"SettingsViewController"];
+        
+        [self presentViewController:viewController animated:YES completion:^{
+            //[[NSNotificationCenter defaultCenter] removeObserver:self];
+        }];
+
+    }
+    
+    NSDictionary *typingAttributes = @{
+                                       NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:30.0f],
+                                       NSForegroundColorAttributeName : [UIColor whiteColor],
+                                       NSStrokeColorAttributeName : [UIColor colorWithRed:255.0f/255.0f green:140.0f/255.0f blue:24.0f/255.0f alpha:1.0f],
+                                       NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                                       };
+    NSAttributedString *str = [[NSAttributedString alloc]
+                               initWithString:NSLocalizedString(@"Scan QR",@"Scan QR")
+                               attributes:typingAttributes];
+    
+    [_startButton setAttributedTitle:str forState:UIControlStateNormal];
+    
+    typingAttributes = @{
+                                       NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:30.0f],
+                                       NSForegroundColorAttributeName : [UIColor whiteColor],
+                                       NSStrokeColorAttributeName : [UIColor colorWithRed:95.0f/255.0f green:22.0f/255.0f blue:161.0f/255.0f alpha:1.0f],
+                                       NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                                       };
+    str = [[NSAttributedString alloc]
+                               initWithString:NSLocalizedString(@"Enter IP",@"Enter IP")
+                               attributes:typingAttributes];
+    
+    [_enteripButton setAttributedTitle:str forState:UIControlStateNormal];
+    
+    typingAttributes = @{
+                                       NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:30.0f],
+                                       NSForegroundColorAttributeName : [UIColor whiteColor],
+                                       NSStrokeColorAttributeName : [UIColor colorWithRed:253.0f/255.0f green:18.0f/255.0f blue:18.0f/255.0f alpha:1.0f],
+                                       NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                                       };
+    str = [[NSAttributedString alloc]
+                               initWithString:NSLocalizedString(@"Settings",@"Settings")
+                               attributes:typingAttributes];
+    
+    [_settingsButton setAttributedTitle:str forState:UIControlStateNormal];
+    
     [[UIDevice currentDevice] setValue:
      [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
                                 forKey:@"orientation"];
@@ -38,7 +88,9 @@
                                                object:nil];
      _myAPI = [API sharedController];
     
+    //self.title = NSLocalizedString(@"view_settings_title", @"Settings");
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -55,32 +107,12 @@
 }
 - (IBAction)startTab:(id)sender
 {
-    if (_nikPole.text.length>0)
-    {
-        [_myAPI setUserName:_nikPole.text];
-        WCScanViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"WCScanViewController"];
-        
-        [self presentViewController:viewController animated:YES completion:^{
-            [[NSNotificationCenter defaultCenter] removeObserver:self];
-        }];
-    }
-    else
-    {
-        UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"Error!!" message:@"Введите имя пользователя" preferredStyle:UIAlertControllerStyleAlert];
-        
-        UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"Ок" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
-            [_nikPole resignFirstResponder];
-        }];
-        [alertController addAction:okAction];
-        [alertController setModalPresentationStyle:UIModalPresentationPopover];
-        
-        UIPopoverPresentationController *popPresenter = [alertController
-                                                         popoverPresentationController];
-        popPresenter.sourceView = _nikPole;
-        popPresenter.sourceRect = _nikPole.bounds;
-        
-        [self presentViewController:alertController animated:YES completion:nil];
-    }
+//        WCScanViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"WCScanViewController"];
+//        
+//        [self presentViewController:viewController animated:YES completion:^{
+//            [[NSNotificationCenter defaultCenter] removeObserver:self];
+//        }];
+
 }
 
 

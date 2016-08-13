@@ -80,7 +80,7 @@
     [self setBackgroundColor:[UIColor whiteColor]];
     if (_isRotatingCard) {
         self.layer.cornerRadius = self.frame.size.width/4;
-        [self setBackgroundColor:[UIColor yellowColor]];
+        //[self setBackgroundColor:[UIColor yellowColor]];
     }
     [self drawRect:self.frame];
 
@@ -801,6 +801,7 @@
     }
     
     if (inPoint == _startRoad || toPoint == _startRoad) {
+        
         if (_roadColor) {
             CGContextSetFillColorWithColor(context, _roadColor.CGColor);
         }
@@ -875,7 +876,9 @@
 //        }
         CGContextSetFillColorWithColor(context, [UIColor whiteColor].CGColor);
     }
-    
+    if (_isRotatingCard) {
+        CGContextSetFillColorWithColor(context, [UIColor yellowColor].CGColor);
+    }
     CGPathRef thickPath = CGPathCreateCopyByStrokingPath(path, NULL, 4, kCGLineCapButt, kCGLineJoinBevel, 0);
     CGContextAddPath(context, thickPath);
     

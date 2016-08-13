@@ -9,6 +9,8 @@
 #import "GameViewController.h"
 #import "GameCardView.h"
 #import "API.h"
+#import <Chartboost/Chartboost.h>
+#import "ViewController.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
@@ -59,14 +61,7 @@ alpha:1.0]
     
     _okButton.layer.cornerRadius = 10.f;
     arrayOfCard = [NSArray arrayWithObjects:_card_1,_card_2,_card_3, nil];
-    
-    /*{"card":[18,29,34],"color":-769226,"cur_user":"Pupkin","game_cmd":"info","game_over":false,"path":1,"response":"action","step":true}*/
-//    _cardArray = [NSArray arrayWithObjects:@"18",@"29",@"34",nil];
-//    _roadStart = 1;
-//    _rotate = 0;
-    
-   // [self loadCard];
-    // Do any additional setup after loading the view.
+
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(gameInitNotification:)
                                                  name:@"cardInit"
@@ -86,7 +81,7 @@ alpha:1.0]
 - (void) gameEnd:(NSNotification *) notification
 {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
-    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"Игра оконченна" message:@"ЭЭ" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Игра оконченна",@"Игра оконченна") message:NSLocalizedString(@"Сообщение об окончании игры",@"Сообщение об окончании игры") preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* actionButtonOk = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -94,7 +89,9 @@ alpha:1.0]
         [[UIDevice currentDevice] setValue:
          [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
                                     forKey:@"orientation"];
-        [[[[[self presentingViewController] presentingViewController] presentingViewController] presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+        
+        [self dismisExit];
+        
     }];
     
     [alertController addAction:actionButtonOk];
@@ -105,20 +102,33 @@ alpha:1.0]
 {
     BOOL isWinn = [[[notification userInfo] objectForKey:@"game_over"] boolValue];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
-    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:@"Игра оконченна" message:isWinn?@"Вы выиграли!":@"Вы проиграли!" preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Игра оконченна",@"Игра оконченна") message:isWinn?NSLocalizedString(@"Вы выиграли!",@"Вы выиграли!"):NSLocalizedString(@"Вы проиграли!",@"Вы проиграли!") preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* actionButtonOk = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
         [[UIDevice currentDevice] setValue:
          [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
                                     forKey:@"orientation"];
-        [[[[[self presentingViewController] presentingViewController] presentingViewController] presentingViewController] dismissViewControllerAnimated:YES completion:nil];
+
+        [self dismisExit];
     }];
     
     [alertController addAction:actionButtonOk];
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
+- (void) dismisExit
+{
+    UIViewController* view = [self presentingViewController];
+    while (![view isKindOfClass:[ViewController class]]) {
+        view = [view presentingViewController];
+    }
+    [view dismissViewControllerAnimated:YES completion:^{
+        
+        [Chartboost cacheRewardedVideo:CBLocationMainMenu];
+        
+    }];
+}
 -(void) gameInitNotification:(NSNotification *) notification {
     [_activity stopAnimating];
     NSLog(@"User info %@", notification.userInfo);
@@ -128,7 +138,8 @@ alpha:1.0]
     _cardArray = cardArray;
     rotateArray = [NSArray arrayWithArray:[notification.userInfo objectForKey:@"rotating"]];
     _roadStart = [[notification.userInfo objectForKey:@"path"] integerValue];
-    [_NextStepName setText:[NSString stringWithFormat:@"Следующим ходит: %@",[notification.userInfo objectForKey:@"cur_user"]]];
+    //
+    [_NextStepName setText:[NSString stringWithFormat:NSLocalizedString(@"Следующим ходит: %@",@"Следующим ходит: "),[notification.userInfo objectForKey:@"cur_user"]]];
     roadColor = UIColorFromRGB([[notification.userInfo objectForKey:@"color"] integerValue]);
     [self.view setBackgroundColor:roadColor];
     _card_1.roadColor = roadColor;
@@ -200,7 +211,7 @@ alpha:1.0]
     for (GameCardView* tempCard in arrayOfCard) {
         if (tempCard == selectCard) {
             tempCard.layer.borderColor = [UIColor blueColor].CGColor;
-            tempCard.layer.borderWidth = 2;
+            tempCard.layer.borderWidth = 4.5f;
             
         }
         else

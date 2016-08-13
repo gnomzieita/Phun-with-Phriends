@@ -14,9 +14,17 @@
 {
     _gid = [dictInfo objectForKey:@"gid"];
     _gv = [dictInfo objectForKey:@"gv"];
-    //_ip = @"192.168.2.1";
+    
+#if DEBUG
+    
+    #  warning TEST IP
+    //_ip = @"100.100.0.34";
+    _ip = @"192.168.2.24";
+    
+#else
     _ip = [dictInfo objectForKey:@"ip"];
-#warning TEST IP
+#endif
+    //_ip = [dictInfo objectForKey:@"ip"];
     _port = [dictInfo objectForKey:@"port"];
     _ssid = [dictInfo objectForKey:@"ssid"];
     return self;

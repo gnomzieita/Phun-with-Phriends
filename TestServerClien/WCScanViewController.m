@@ -21,6 +21,7 @@
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
 @property (nonatomic, strong) AVAudioPlayer *audioPlayer;
 @property (nonatomic) BOOL isReading;
+- (IBAction)cancelButton:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UIView *viewPreview;
 
@@ -271,5 +272,9 @@
     return NO;
 }
 
+- (IBAction)cancelButton:(id)sender
+{
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
 @end
 

@@ -1,0 +1,60 @@
+
+/* Class = "UILabel"; text = "Выберите начальный путь:"; ObjectID = "0MD-7R-CfN"; */
+"0MD-7R-CfN.text" = "Выберите начальный путь:";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "1qp-oJ-cvJ"; */
+"1qp-oJ-cvJ.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "-->"; ObjectID = "6tn-Dz-iGT"; */
+"6tn-Dz-iGT.normalTitle" = "-->";
+
+/* Class = "UILabel"; text = "Ожидаем старта игры..."; ObjectID = "8ls-C5-M0k"; */
+"8ls-C5-M0k.text" = "Ожидаем старта игры...";
+
+/* Class = "UILabel"; text = "Тип игры"; ObjectID = "99j-PN-XDn"; */
+"99j-PN-XDn.text" = "Тип игры";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "D5J-nb-16o"; */
+"D5J-nb-16o.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "START"; ObjectID = "EQe-FY-ymI"; */
+"EQe-FY-ymI.normalTitle" = "START";
+
+/* Class = "UIButton"; normalTitle = "Старт"; ObjectID = "H3n-Ht-Ysa"; */
+"H3n-Ht-Ysa.normalTitle" = "Старт";
+
+/* Class = "UILabel"; text = "Имя игрока:"; ObjectID = "LZz-Im-R0X"; */
+"LZz-Im-R0X.text" = "Имя игрока:";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "UHR-G1-m6R"; */
+"UHR-G1-m6R.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "VdX-1e-dXr"; */
+"VdX-1e-dXr.normalTitle" = "Button";
+
+/* Class = "UITextField"; placeholder = "User Nik"; ObjectID = "gPf-HS-KQZ"; */
+"gPf-HS-KQZ.placeholder" = "User Nik";
+
+/* Class = "UITextField"; text = "Alex"; ObjectID = "gPf-HS-KQZ"; */
+"gPf-HS-KQZ.text" = "Alex";
+
+/* Class = "UILabel"; text = "Тип игры"; ObjectID = "hEv-XL-Zx2"; */
+"hEv-XL-Zx2.text" = "Тип игры";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "hfA-dV-R7m"; */
+"hfA-dV-R7m.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "<--"; ObjectID = "iWf-KH-oGq"; */
+"iWf-KH-oGq.normalTitle" = "<--";
+
+/* Class = "UILabel"; text = "Ожидаем старта игры..."; ObjectID = "jgH-y5-GXE"; */
+"jgH-y5-GXE.text" = "Ожидаем старта игры...";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "loH-GZ-Mvi"; */
+"loH-GZ-Mvi.text" = "Label";
+
+/* Class = "UILabel"; text = "Перемешивание игроков:"; ObjectID = "sZD-7g-mEG"; */
+"sZD-7g-mEG.text" = "Перемешивание игроков:";
+
+/* Class = "UIButton"; normalTitle = "Ок"; ObjectID = "vpl-A2-5PL"; */
+"vpl-A2-5PL.normalTitle" = "Ок";

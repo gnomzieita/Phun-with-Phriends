@@ -9,9 +9,9 @@
 #import "API.h"
 #import <ifaddrs.h>
 #import <arpa/inet.h>
-#import <UIKit/UIKit.h>
 #import <SystemConfiguration/CaptiveNetwork.h>
 #import "WCScanViewController.h"
+#import "ViewController.h"
 
 #define SERVER_PORT 8080
 
@@ -60,6 +60,9 @@ static API *_sharedController = nil;
     userDef = [NSUserDefaults standardUserDefaults];
     if ([userDef objectForKey:@"token"]) {
         [self initConnectWithServer:[userDef objectForKey:@"serverAddress"] Port:[[userDef objectForKey:@"serverPort"] intValue]];
+    }
+    if ([userDef objectForKey:@"userName"]) {
+        [self setUserName:[userDef objectForKey:@"userName"]];
     }
 }
 
@@ -128,9 +131,9 @@ static API *_sharedController = nil;
      */
     
     [dict setObject:@"init" forKey:@"command"];
-    [dict setObject:[UIDevice currentDevice].identifierForVendor.UUIDString forKey:@"device_id"];
+    //[dict setObject:[UIDevice currentDevice].identifierForVendor.UUIDString forKey:@"device_id"];
     
-    //[dict setObject:@"lol" forKey:@"device_id"];
+    [dict setObject:@"lol" forKey:@"device_id"];
     
     [dict setObject:@"TestGame" forKey:@"game_id"];
     [dict setObject:[NSNumber numberWithInt:1] forKey:@"game_version"];
@@ -297,13 +300,15 @@ static API *_sharedController = nil;
     [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [inputStream open];
     [outputStream open];
-    serverTimer = [NSTimer scheduledTimerWithTimeInterval:0.4
+    
+    serverTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                    target:self
                                                  selector:@selector(sendLeave)
                                                  userInfo:nil
                                                   repeats:YES];
     
-    if ([userDef objectForKey:@"token"]) {
+    if ([userDef objectForKey:@"token"])
+    {
         token = [userDef objectForKey:@"token"];
         serverInit = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                       target:self
@@ -313,7 +318,7 @@ static API *_sharedController = nil;
     }
     else
     {
-        serverInit = [NSTimer scheduledTimerWithTimeInterval:0.5
+        serverInit = [NSTimer scheduledTimerWithTimeInterval:0.4
                                                       target:self
                                                     selector:@selector(sendInitServerComand)
                                                     userInfo:nil
@@ -325,6 +330,7 @@ static API *_sharedController = nil;
 - (void) sendLeave {
     
     [self sendMessage:@"!"];
+    //NSLog(@"!");
     //[self sendInitServerComand];
     
 }
@@ -332,8 +338,11 @@ static API *_sharedController = nil;
 - (void) sendMessage:(NSString*)message {
     
     NSString *response  = [NSString stringWithFormat:@"%@\r", message];
-    NSLog(@"sendMessage: %@",response);
-    NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSASCIIStringEncoding]];
+    if (![message isEqualToString:@"!"]) {
+        NSLog(@"sendMessage: %@",response);
+    }
+    //NSLog(@"sendMessage: %@",response);
+    NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSUTF8StringEncoding]];
     [outputStream write:[data bytes] maxLength:[data length]];
     
 }
@@ -356,20 +365,20 @@ static API *_sharedController = nil;
             
             break;
         case NSStreamStatusOpening:
-            NSLog(@"NSStreamStatusOpening");
+            //NSLog(@"NSStreamStatusOpening");
             
             break;
         case NSStreamStatusOpen:
-//            NSLog(@"NSStreamStatusOpen");
-//            NSLog(@"stream event %lu", (unsigned long)streamEvent);
+            //NSLog(@"NSStreamStatusOpen");
+            //NSLog(@"stream event %lu", (unsigned long)streamEvent);
             
             switch (streamEvent) {
                     
                 case NSStreamEventOpenCompleted:
-                   // NSLog(@"Stream opened");
-                    if (theStream == outputStream) {
-                        //[self sendInitServerComand];
-                    }
+                   NSLog(@"Stream opened");
+//                    if (theStream == outputStream) {
+//                        [self sendInitServerComand];
+//                    }
                     
                     break;
                 case NSStreamEventHasBytesAvailable:
@@ -383,7 +392,7 @@ static API *_sharedController = nil;
                             len = [inputStream read:buffer maxLength:sizeof(buffer)];
                             if (len > 0) {
                                 
-                                NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding];
+                                NSString *output = [[NSString alloc] initWithBytes:buffer length:len encoding:NSUTF8StringEncoding];
                                 
                                 if (nil != output) {
                                     
@@ -410,11 +419,11 @@ static API *_sharedController = nil;
                     [theStream close];
                     [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
                     theStream = nil;
-                    
+                    [self popToTop:nil];
                     break;
                     
                 case NSStreamEventNone:
-                    //NSLog(@"NSStreamEventNone!");
+                    NSLog(@"NSStreamEventNone!");
                     break;
                 case NSStreamEventHasSpaceAvailable:
                     //NSLog(@"NSStreamEventHasSpaceAvailable");
@@ -437,6 +446,8 @@ static API *_sharedController = nil;
             [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             theStream = nil;
             [serverTimer invalidate];
+            [self popToTop:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
         case NSStreamStatusClosed:
             NSLog(@"NSStreamStatusClosed");
@@ -444,6 +455,8 @@ static API *_sharedController = nil;
             [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             theStream = nil;
             [serverTimer invalidate];
+            [self popToTop:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
         case NSStreamStatusError:
             NSLog(@"NSStreamStatusError");
@@ -454,20 +467,47 @@ static API *_sharedController = nil;
             [theStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
             theStream = nil;
             [serverTimer invalidate];
+            
+            [self showErrorMessage:[NSString stringWithFormat:@"streamError: %@",theStream.streamError] handler:nil];
+            
+            [self popToTop:nil];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
             
         default:
+            NSLog(@"DEFAULT");
             break;
     }
 }
 
+- (void) popToTop:(void (^ __nullable)(void))completion
+{
+    UIViewController* view = [[self currentTopViewController] presentingViewController];
+    while (![view isKindOfClass:[ViewController class]] && view) {
+        view = [view presentingViewController];
+    }
+    [view dismissViewControllerAnimated:YES completion:completion];
+}
+
+/*
+ settings_sync – синхронизация настроек между сервером и клиентом. Работает так же как и start, но не начинает игру. Может быть отправлена в любой момент
+ 
+ {"response":"settings_sync",”game_type”:0,”card_type”:0,”user_shuffle”:true, "rotate_count":0, "rotate_vector":0 }
+ 
+ {"command":"settings_sync",”game_type”:0,”card_type”:0,”user_shuffle”:true, "rotate_count":0, "rotate_vector":0 }
+
+ */
 - (void) messageReceived:(NSString *)message
 {
 
     NSDictionary* responseDict = [self jsonStringToDictionary:message];
     NSLog(@"messageReceived: %@",message);
 //     NSLog(@"responseDict: %@",responseDict);
-    if ([[responseDict objectForKey:@"response"] isEqualToString:@"init"])
+    if ([[responseDict objectForKey:@"response"] isEqualToString:@"settings_sync"])
+    {
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"settings_sync" object:self userInfo:responseDict];
+    }
+    else if ([[responseDict objectForKey:@"response"] isEqualToString:@"init"])
     {
     /*
      {"admin":true,"game_type":0,"response":"init","token":1460459365508,"user_shuffle":true}

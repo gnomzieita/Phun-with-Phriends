@@ -10,6 +10,7 @@
 #import <CoreFoundation/CFBase.h>
 #import "GCDAsyncSocket.h"
 #import "ServerInfoObject.h"
+#import <UIKit/UIKit.h>
 
 @protocol API_Delegat <NSObject>
 
@@ -38,10 +39,12 @@
 
 - (void) setUserName:(NSString*)userName;
 
-- (void) showErrorMessage:(NSString*)errorString;
+- (void) showErrorMessage:(NSString*)errorString  handler:(void (^)(UIAlertAction *action))handler;
 
 - (void) sendMessage:(NSString*)message;
 
 - (NSString*) objectToJSONString:(id)obj;
+
+- (void) popToTop:(void (^ __nullable)(void))completion;
 
 @end
