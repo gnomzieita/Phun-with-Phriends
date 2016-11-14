@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 typedef NS_ENUM(NSInteger, GameCardType) {
+    GameCardType_0 = 0,
     GameCardType_1 = 1,
     GameCardType_2,
     GameCardType_3,
@@ -52,9 +53,14 @@ typedef NS_ENUM(NSInteger, GameCardType) {
 @property (assign, nonatomic) GameCardType cardType;
 @property (assign, nonatomic) NSInteger rotate;
 @property (assign, nonatomic) NSInteger startRoad;
-@property (assign, nonatomic) UIColor* roadColor;
+@property (strong, nonatomic) UIColor* roadColor;
+
+@property (strong, nonatomic) NSDictionary* cardTable;
+
+@property (strong, nonatomic) NSMutableArray* pointArray;
 
 - (instancetype)initInPoint:(CGPoint)point WithHeight:(CGFloat)kubHeight WithType:(GameCardType)cType;
 - (void)setType:(GameCardType)cType startRoad:(NSInteger)startRoad rotate:(NSInteger)rotate;
-
+- (void)drawRect;
+- (void)drawRect:(CGRect)rect;
 @end

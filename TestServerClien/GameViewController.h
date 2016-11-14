@@ -11,5 +11,5 @@
 @interface GameViewController : UIViewController
 
 @property (strong, nonatomic) NSArray* cardArray;
-
+-(void) gameInitNotification:(NSNotification *) notification;
 @end

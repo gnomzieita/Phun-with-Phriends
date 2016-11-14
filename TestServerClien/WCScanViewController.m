@@ -12,10 +12,13 @@
 #import "ServerInfoObject.h"
 #import "WaitStartViewController.h"
 #import "AdminViewController.h"
+#import "MyLabel.h"
+#import <AVFoundation/AVFoundation.h>
 
 @interface WCScanViewController () <AVCaptureMetadataOutputObjectsDelegate,WCScanViewControllerDelegat,UIAlertViewDelegate>
 {
     API *myAPI;
+    ServerInfoObject* serverObj;
 }
 @property (nonatomic, strong) AVCaptureSession *captureSession;
 @property (nonatomic, strong) AVCaptureVideoPreviewLayer *videoPreviewLayer;
@@ -24,6 +27,10 @@
 - (IBAction)cancelButton:(id)sender;
 
 @property (weak, nonatomic) IBOutlet UIView *viewPreview;
+
+@property (weak, nonatomic) IBOutlet UILabel *connectLabel;
+@property (weak, nonatomic) IBOutlet UIView *errorSSIDMessage;
+@property (weak, nonatomic) IBOutlet UIButton *refreshButton;
 
 
 @end
@@ -37,6 +44,22 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    
+    _refreshButton.layer.borderColor = [UIColor colorWithRed:214/255.0f green:167/255.0f blue:112/255.0f alpha:1.0f].CGColor;
+    _refreshButton.layer.borderWidth = 1.0f;
+    _refreshButton.layer.cornerRadius = 5.0f;
+    
+    NSDictionary *typingAttributes = @{
+                                       NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:16.0f],
+                                       NSForegroundColorAttributeName : [UIColor whiteColor],
+                                       NSStrokeColorAttributeName : [UIColor blackColor],
+                                       NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                                       };
+    NSAttributedString *str = [[NSAttributedString alloc]
+                               initWithString:NSLocalizedString(@"Refresh",@"Refresh")
+                               attributes:typingAttributes];
+    
+    [_refreshButton setAttributedTitle:str forState:UIControlStateNormal];
     
     [[UIDevice currentDevice] setValue:
      [NSNumber numberWithInteger: UIInterfaceOrientationPortrait]
@@ -253,13 +276,20 @@
                                                            error:&jsonError];
     if (!jsonError) {
         NSLog(@"json: %@",json);
-        [myAPI initConnectWithServerInfo:[[ServerInfoObject alloc] initWithDictionary:json]];
+        serverObj = [[ServerInfoObject alloc] initWithDictionary:json];
+        
+        [_connectLabel setStrokeText:[NSString stringWithFormat:NSLocalizedString(@"Connect to “%@“ Wi-Fi and tap Refresh",@"Connect to Wi-Fi and tap Refresh"),serverObj.ssid]];
+        [self refreshButtonTap:nil];
     }
     else
     {
         NSLog(@"jsonError: %@",jsonError);
     }
     
+}
+- (IBAction)refreshButtonTap:(id)sender
+{
+    [_errorSSIDMessage setHidden:[myAPI initConnectWithServerInfo:serverObj]];
 }
 
 - (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex

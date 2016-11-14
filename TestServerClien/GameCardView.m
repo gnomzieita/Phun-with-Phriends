@@ -12,8 +12,6 @@
 @property (assign, nonatomic) CGFloat kubHeight;
 @property (assign, nonatomic) CGFloat kubStep;
 
-@property (strong, nonatomic) NSDictionary* cardTable;
-
 @end
 
 @implementation GameCardView
@@ -26,6 +24,7 @@
     _cardType = cType;
     self.layer.borderColor = [UIColor blackColor].CGColor;
     self.layer.borderWidth = 1;
+    
     [self setBackgroundColor:[UIColor whiteColor]];
     
     return self;
@@ -35,9 +34,12 @@
 {
     [self setNeedsDisplay];
     _rotate = rotate;
-    _startRoad = startRoad;
+    if (!_startRoad) {
+        _startRoad = startRoad;
+    }
     
-    _cardTable = @{[NSNumber numberWithInteger:1]:@[@"2",@"1",@"4",@"3",@"6",@"5",@"8",@"7"],
+    _cardTable = @{[NSNumber numberWithInteger:0]:@[],
+                   [NSNumber numberWithInteger:1]:@[@"2",@"1",@"4",@"3",@"6",@"5",@"8",@"7"],
                    [NSNumber numberWithInteger:2]:@[@"2",@"1",@"4",@"3",@"7",@"8",@"5",@"6"],
                    [NSNumber numberWithInteger:3]:@[@"3",@"7",@"1",@"6",@"8",@"4",@"2",@"5"],
                    [NSNumber numberWithInteger:4]:@[@"4",@"3",@"2",@"1",@"6",@"5",@"8",@"7"],
@@ -97,23 +99,31 @@
         
         //[tempDict addObject:@"1"];
         
-        for (int i = 1; i<9; i++) {
-            NSInteger moveIn = (i+_rotate*2)>8?(i+_rotate*2)%8:(i+_rotate*2);
-            NSInteger moveTo = ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)>8?([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)%8: ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2);
-            NSLog(@"%i -> %i",moveIn,moveTo);
-            [self moveIn:moveIn toPoint:moveTo];
-//            if (![tempDict containsObject:[NSString stringWithFormat:@"%i",moveIn]] && ![tempDict containsObject:[NSString stringWithFormat:@"%i",moveTo]]) {
-//                [tempDict addObject:[NSString stringWithFormat:@"%i",moveIn]];
-//                [tempDict addObject:[NSString stringWithFormat:@"%i",moveTo]];
-//                [self moveIn:moveIn toPoint:moveTo];
-//                
-//                
-//            }
+        if (numArray.count > 0) {
+            for (int i = 1; i<9; i++) {
+                NSInteger moveIn = (i+_rotate*2)>8?(i+_rotate*2)%8:(i+_rotate*2);
+                NSInteger moveTo = ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)>8?([[numArray objectAtIndex:i-1] integerValue]+_rotate*2)%8: ([[numArray objectAtIndex:i-1] integerValue]+_rotate*2);
+                NSLog(@"%li ->%lii",(long)moveIn,(long)moveTo);
+                
+                if (!_pointArray) {
+                    _pointArray = [NSMutableArray array];
+                }
+                
+                if (moveIn == _startRoad || moveTo == _startRoad) {
+                    
+                    [_pointArray addObject:[NSNumber numberWithInteger:moveTo]];
+                    [_pointArray addObject:[NSNumber numberWithInteger:moveIn]];
+                }
+                [self moveIn:moveIn toPoint:moveTo];
+            }
         }
     }
     
 }
-
+- (void)drawRect
+{
+    [self drawRect:self.frame];
+}
 
 #pragma mark - Все состояния 1
 - (void) draw_1_to_2:(CGMutablePathRef*)path
@@ -800,7 +810,8 @@
             break;
     }
     
-    if (inPoint == _startRoad || toPoint == _startRoad) {
+    if ([_pointArray containsObject:[NSNumber numberWithInteger:inPoint]] || [_pointArray containsObject:[NSNumber numberWithInteger:toPoint]]) {
+        
         
         if (_roadColor) {
             CGContextSetFillColorWithColor(context, _roadColor.CGColor);
@@ -808,8 +819,9 @@
         else
         {
             CGContextSetFillColorWithColor(context, [UIColor redColor].CGColor);
+            NSLog(@"redColor");
         }
-        NSLog(@"redColor");
+        
         float x = 0;
         float y = 0;
         switch (_startRoad) {
@@ -861,8 +873,11 @@
             default:
                 break;
         }
-        CGPathMoveToPoint(path, NULL, _kubStep*x, _kubStep*y);
-        CGPathAddArc(path, NULL, _kubStep*x, _kubStep*y, 5.f, -M_PI_2, M_PI_2*3, NO);
+        if (_pointArray.count == 2) {
+            CGPathMoveToPoint(path, NULL, _kubStep*x, _kubStep*y);
+            CGPathAddArc(path, NULL, _kubStep*x, _kubStep*y, 5.f, -M_PI_2, M_PI_2*3, NO);
+        }
+
 
     }
     else

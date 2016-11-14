@@ -11,6 +11,7 @@
 		E12A404D1CABD8090019B3F5 /* WCScanViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E12A404C1CABD8090019B3F5 /* WCScanViewController.m */; };
 		E12A40511CABDD580019B3F5 /* ServerInfoObject.m in Sources */ = {isa = PBXBuildFile; fileRef = E12A40501CABDD580019B3F5 /* ServerInfoObject.m */; };
 		E12A40541CAD4FD00019B3F5 /* GameCardView.m in Sources */ = {isa = PBXBuildFile; fileRef = E12A40531CAD4FD00019B3F5 /* GameCardView.m */; };
+		E1405D4A1D954A3D00110F31 /* PWPPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = E1405D491D954A3B00110F31 /* PWPPlayer.m */; };
 		E14635821CEF4C29001ADCBF /* LocalizationHandlerUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = E14635811CEF4C29001ADCBF /* LocalizationHandlerUtil.m */; };
 		E149C6E81CD0E5C000F37D9F /* AdminViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E149C6E71CD0E5C000F37D9F /* AdminViewController.m */; };
 		E1522CE31C7B435200E793C2 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = E1522CE21C7B435200E793C2 /* main.m */; };
@@ -30,9 +31,24 @@
 		E16FE2891CB69E2900EC5A86 /* GameViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E16FE2881CB69E2900EC5A86 /* GameViewController.m */; };
 		E171FCD11D47B21500C7BE89 /* Admin2CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E171FCD01D47B21500C7BE89 /* Admin2CollectionViewCell.m */; };
 		E171FCD51D48B12F00C7BE89 /* AdminCell3CollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = E171FCD41D48B12F00C7BE89 /* AdminCell3CollectionViewCell.m */; };
+		E183A94A1DAD2CB8003FF752 /* SingleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E183A9491DAD2CB7003FF752 /* SingleViewController.m */; };
 		E18470AE1CCBBFEF00B8F898 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E18470AD1CCBBFEF00B8F898 /* Images.xcassets */; };
 		E191EA4B1CE60151007EACC9 /* Chartboost.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E191EA4A1CE60151007EACC9 /* Chartboost.framework */; };
 		E1A158A91D4B989D00D89BF7 /* MyLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = E1A158A81D4B989D00D89BF7 /* MyLabel.m */; };
+		E1AC87B51D82F0D3006CE5C0 /* Cheer.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87A71D82F0D3006CE5C0 /* Cheer.mp3 */; };
+		E1AC87B61D82F0D3006CE5C0 /* Countdown.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87A81D82F0D3006CE5C0 /* Countdown.mp3 */; };
+		E1AC87B71D82F0D3006CE5C0 /* Crash.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87A91D82F0D3006CE5C0 /* Crash.mp3 */; };
+		E1AC87B81D82F0D3006CE5C0 /* Door Slam.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AA1D82F0D3006CE5C0 /* Door Slam.mp3 */; };
+		E1AC87B91D82F0D3006CE5C0 /* Game Start.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AB1D82F0D3006CE5C0 /* Game Start.mp3 */; };
+		E1AC87BA1D82F0D3006CE5C0 /* Hurry Up.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AC1D82F0D3006CE5C0 /* Hurry Up.mp3 */; };
+		E1AC87BB1D82F0D3006CE5C0 /* idle.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AD1D82F0D3006CE5C0 /* idle.mp3 */; };
+		E1AC87BC1D82F0D3006CE5C0 /* Music - Country.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AE1D82F0D3006CE5C0 /* Music - Country.mp3 */; };
+		E1AC87BD1D82F0D3006CE5C0 /* Music - Electric.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87AF1D82F0D3006CE5C0 /* Music - Electric.mp3 */; };
+		E1AC87BE1D82F0D3006CE5C0 /* MusicIntro.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87B01D82F0D3006CE5C0 /* MusicIntro.mp3 */; };
+		E1AC87BF1D82F0D3006CE5C0 /* Music - Rock.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87B11D82F0D3006CE5C0 /* Music - Rock.mp3 */; };
+		E1AC87C01D82F0D3006CE5C0 /* Music - Upbeat.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87B21D82F0D3006CE5C0 /* Music - Upbeat.mp3 */; };
+		E1AC87C11D82F0D3006CE5C0 /* Rev.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87B31D82F0D3006CE5C0 /* Rev.mp3 */; };
+		E1AC87C21D82F0D3006CE5C0 /* Sounds.txt in Resources */ = {isa = PBXBuildFile; fileRef = E1AC87B41D82F0D3006CE5C0 /* Sounds.txt */; };
 		E1AF95281CEB1F5800ED0F95 /* AdSupport.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1AF95271CEB1F5800ED0F95 /* AdSupport.framework */; };
 		E1AF952A1CEB1F6400ED0F95 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1AF95291CEB1F6400ED0F95 /* StoreKit.framework */; };
 		E1B818D61CBD1DA80077C6DB /* WaitStartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E1B818D51CBD1DA80077C6DB /* WaitStartViewController.m */; };
@@ -53,6 +69,8 @@
 		E12A40501CABDD580019B3F5 /* ServerInfoObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ServerInfoObject.m; sourceTree = "<group>"; };
 		E12A40521CAD4FD00019B3F5 /* GameCardView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameCardView.h; sourceTree = "<group>"; };
 		E12A40531CAD4FD00019B3F5 /* GameCardView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GameCardView.m; sourceTree = "<group>"; };
+		E1405D481D954A3B00110F31 /* PWPPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PWPPlayer.h; sourceTree = "<group>"; };
+		E1405D491D954A3B00110F31 /* PWPPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PWPPlayer.m; sourceTree = "<group>"; };
 		E146357F1CEF4B80001ADCBF /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		E14635801CEF4C29001ADCBF /* LocalizationHandlerUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LocalizationHandlerUtil.h; sourceTree = "<group>"; };
 		E14635811CEF4C29001ADCBF /* LocalizationHandlerUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LocalizationHandlerUtil.m; sourceTree = "<group>"; };
@@ -86,10 +104,26 @@
 		E171FCD01D47B21500C7BE89 /* Admin2CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Admin2CollectionViewCell.m; sourceTree = "<group>"; };
 		E171FCD31D48B12F00C7BE89 /* AdminCell3CollectionViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdminCell3CollectionViewCell.h; sourceTree = "<group>"; };
 		E171FCD41D48B12F00C7BE89 /* AdminCell3CollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdminCell3CollectionViewCell.m; sourceTree = "<group>"; };
+		E183A9481DAD2CB7003FF752 /* SingleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleViewController.h; sourceTree = "<group>"; };
+		E183A9491DAD2CB7003FF752 /* SingleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SingleViewController.m; sourceTree = "<group>"; };
 		E18470AD1CCBBFEF00B8F898 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "../Phunky Phreeways/Images.xcassets"; sourceTree = "<group>"; };
 		E191EA4A1CE60151007EACC9 /* Chartboost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Chartboost.framework; sourceTree = "<group>"; };
 		E1A158A71D4B989D00D89BF7 /* MyLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyLabel.h; sourceTree = "<group>"; };
 		E1A158A81D4B989D00D89BF7 /* MyLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyLabel.m; sourceTree = "<group>"; };
+		E1AC87A71D82F0D3006CE5C0 /* Cheer.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Cheer.mp3; sourceTree = "<group>"; };
+		E1AC87A81D82F0D3006CE5C0 /* Countdown.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Countdown.mp3; sourceTree = "<group>"; };
+		E1AC87A91D82F0D3006CE5C0 /* Crash.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Crash.mp3; sourceTree = "<group>"; };
+		E1AC87AA1D82F0D3006CE5C0 /* Door Slam.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Door Slam.mp3"; sourceTree = "<group>"; };
+		E1AC87AB1D82F0D3006CE5C0 /* Game Start.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Game Start.mp3"; sourceTree = "<group>"; };
+		E1AC87AC1D82F0D3006CE5C0 /* Hurry Up.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Hurry Up.mp3"; sourceTree = "<group>"; };
+		E1AC87AD1D82F0D3006CE5C0 /* idle.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = idle.mp3; sourceTree = "<group>"; };
+		E1AC87AE1D82F0D3006CE5C0 /* Music - Country.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Music - Country.mp3"; sourceTree = "<group>"; };
+		E1AC87AF1D82F0D3006CE5C0 /* Music - Electric.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Music - Electric.mp3"; sourceTree = "<group>"; };
+		E1AC87B01D82F0D3006CE5C0 /* MusicIntro.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = MusicIntro.mp3; sourceTree = "<group>"; };
+		E1AC87B11D82F0D3006CE5C0 /* Music - Rock.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Music - Rock.mp3"; sourceTree = "<group>"; };
+		E1AC87B21D82F0D3006CE5C0 /* Music - Upbeat.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = "Music - Upbeat.mp3"; sourceTree = "<group>"; };
+		E1AC87B31D82F0D3006CE5C0 /* Rev.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = Rev.mp3; sourceTree = "<group>"; };
+		E1AC87B41D82F0D3006CE5C0 /* Sounds.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Sounds.txt; sourceTree = "<group>"; };
 		E1AF95271CEB1F5800ED0F95 /* AdSupport.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AdSupport.framework; path = System/Library/Frameworks/AdSupport.framework; sourceTree = SDKROOT; };
 		E1AF95291CEB1F6400ED0F95 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		E1B818D41CBD1DA80077C6DB /* WaitStartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WaitStartViewController.h; sourceTree = "<group>"; };
@@ -146,6 +180,8 @@
 				E1522CFF1C7B467B00E793C2 /* API.m */,
 				E12A404F1CABDD580019B3F5 /* ServerInfoObject.h */,
 				E12A40501CABDD580019B3F5 /* ServerInfoObject.m */,
+				E1405D481D954A3B00110F31 /* PWPPlayer.h */,
+				E1405D491D954A3B00110F31 /* PWPPlayer.m */,
 			);
 			name = API;
 			sourceTree = "<group>";
@@ -175,6 +211,7 @@
 		E1522CE01C7B435200E793C2 /* TestServerClien */ = {
 			isa = PBXGroup;
 			children = (
+				E1AC87A61D82F0D3006CE5C0 /* SFX and Music */,
 				E191EA4A1CE60151007EACC9 /* Chartboost.framework */,
 				E1522CE41C7B435200E793C2 /* AppDelegate.h */,
 				E1522CE51C7B435200E793C2 /* AppDelegate.m */,
@@ -187,6 +224,8 @@
 				E12A404B1CABD8090019B3F5 /* WCScanViewController.h */,
 				E12A404C1CABD8090019B3F5 /* WCScanViewController.m */,
 				E1522CEA1C7B435200E793C2 /* Main.storyboard */,
+				E183A9481DAD2CB7003FF752 /* SingleViewController.h */,
+				E183A9491DAD2CB7003FF752 /* SingleViewController.m */,
 				E168ABBC1D4F4ED8008E1176 /* SettingsProtocol.h */,
 				E149C6E61CD0E5C000F37D9F /* AdminViewController.h */,
 				E149C6E71CD0E5C000F37D9F /* AdminViewController.m */,
@@ -253,6 +292,27 @@
 			name = "Admin Cell 3";
 			sourceTree = "<group>";
 		};
+		E1AC87A61D82F0D3006CE5C0 /* SFX and Music */ = {
+			isa = PBXGroup;
+			children = (
+				E1AC87A71D82F0D3006CE5C0 /* Cheer.mp3 */,
+				E1AC87A81D82F0D3006CE5C0 /* Countdown.mp3 */,
+				E1AC87A91D82F0D3006CE5C0 /* Crash.mp3 */,
+				E1AC87AA1D82F0D3006CE5C0 /* Door Slam.mp3 */,
+				E1AC87AB1D82F0D3006CE5C0 /* Game Start.mp3 */,
+				E1AC87AC1D82F0D3006CE5C0 /* Hurry Up.mp3 */,
+				E1AC87AD1D82F0D3006CE5C0 /* idle.mp3 */,
+				E1AC87AE1D82F0D3006CE5C0 /* Music - Country.mp3 */,
+				E1AC87AF1D82F0D3006CE5C0 /* Music - Electric.mp3 */,
+				E1AC87B01D82F0D3006CE5C0 /* MusicIntro.mp3 */,
+				E1AC87B11D82F0D3006CE5C0 /* Music - Rock.mp3 */,
+				E1AC87B21D82F0D3006CE5C0 /* Music - Upbeat.mp3 */,
+				E1AC87B31D82F0D3006CE5C0 /* Rev.mp3 */,
+				E1AC87B41D82F0D3006CE5C0 /* Sounds.txt */,
+			);
+			path = "SFX and Music";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -282,7 +342,7 @@
 		E1522CD61C7B435200E793C2 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Alex Agarkov";
 				TargetAttributes = {
 					E1522CDD1C7B435200E793C2 = {
@@ -314,11 +374,25 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E1AC87C01D82F0D3006CE5C0 /* Music - Upbeat.mp3 in Resources */,
+				E1AC87C21D82F0D3006CE5C0 /* Sounds.txt in Resources */,
+				E1AC87B91D82F0D3006CE5C0 /* Game Start.mp3 in Resources */,
+				E1AC87BE1D82F0D3006CE5C0 /* MusicIntro.mp3 in Resources */,
+				E1AC87BC1D82F0D3006CE5C0 /* Music - Country.mp3 in Resources */,
+				E1AC87B71D82F0D3006CE5C0 /* Crash.mp3 in Resources */,
+				E1AC87BD1D82F0D3006CE5C0 /* Music - Electric.mp3 in Resources */,
+				E1AC87C11D82F0D3006CE5C0 /* Rev.mp3 in Resources */,
 				E16D892D1CF5D7D700A2A381 /* CarterOne.ttf in Resources */,
+				E1AC87B81D82F0D3006CE5C0 /* Door Slam.mp3 in Resources */,
 				E18470AE1CCBBFEF00B8F898 /* Images.xcassets in Resources */,
 				E16D892E1CF5D7E800A2A381 /* ERASDEMI.TTF in Resources */,
+				E1AC87BA1D82F0D3006CE5C0 /* Hurry Up.mp3 in Resources */,
 				E1522CF11C7B435200E793C2 /* LaunchScreen.storyboard in Resources */,
+				E1AC87BF1D82F0D3006CE5C0 /* Music - Rock.mp3 in Resources */,
+				E1AC87BB1D82F0D3006CE5C0 /* idle.mp3 in Resources */,
+				E1AC87B51D82F0D3006CE5C0 /* Cheer.mp3 in Resources */,
 				E1522CEC1C7B435200E793C2 /* Main.storyboard in Resources */,
+				E1AC87B61D82F0D3006CE5C0 /* Countdown.mp3 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -392,7 +466,9 @@
 				E11A5E181C9046370079DDC1 /* TableViewCell.m in Sources */,
 				E1522CE31C7B435200E793C2 /* main.m in Sources */,
 				E16D89311CF7112300A2A381 /* SettingsViewController.m in Sources */,
+				E183A94A1DAD2CB8003FF752 /* SingleViewController.m in Sources */,
 				E171FCD51D48B12F00C7BE89 /* AdminCell3CollectionViewCell.m in Sources */,
+				E1405D4A1D954A3D00110F31 /* PWPPlayer.m in Sources */,
 				E171FCD11D47B21500C7BE89 /* Admin2CollectionViewCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -432,8 +508,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
@@ -476,8 +554,10 @@
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";

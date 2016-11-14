@@ -1,0 +1,28 @@
+PHONE:
+? + Connecting to server - Door open/close (Door Slam.mp3)
+v + Awaiting start - engine idle (idle.mp3 -- loop)
+? + Game Start - Rev (Game Start.mp3)
+? + Select your place - engine idle (idle.mp3 -- loop)
+? + First selection - Rev (Rev.mp3)
+? + Second Selection - Rev (Rev.mp3)
+v + Awaiting Players - engine idle (idle.mp3 -- loop)
+x + Waiting more than 10 sec to select a place and/or select a road - Siren (blink red/blue) (Hurry up.mp3 -- loop) (wrong place)
+? + Lose game - Crash (Crash.mp3)
+? + Win Game - Cheer (Cheer.mp3)
+
+TABLET
+? + New Player Connects - Door open/close (Door Slam.mp3)
+x + Entering game - Count Down (Countdown.mp3) (should be after players select starting points)
+v + Place Tile - Rev (Rev.mp3)
+? + Player Lost - Crash (Crash.mp3)
++ Car Crash - Crash (Crash.mp3) (TRUMPS Cheer.mp3)
+v + End Game - Cheer (Cheer.mp3)
+
+Music:
+v + Main menu - "Music - Intro.mp3"
+
+
+
+v = OK
+? = Not there
+x = Wrong place

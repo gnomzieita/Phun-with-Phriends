@@ -12,6 +12,7 @@
 #import "WCScanViewController.h"
 #import <Chartboost/Chartboost.h>
 #import "SettingsViewController.h"
+#import "AdminViewController.h"
 
 @interface ViewController ()
 
@@ -32,7 +33,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    
+
     if (![[NSUserDefaults standardUserDefaults] objectForKey:@"userName"]) {
         SettingsViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"SettingsViewController"];
         
@@ -86,11 +87,27 @@
                                              selector:@selector(gameInitNotification)
                                                  name:@"back"
                                                object:nil];
-     _myAPI = [API sharedController];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(gameInitNotification:)
+                                                 name:@"gameInit"
+                                               object:nil];
+    
+     _myAPI = [API sharedController];
     //self.title = NSLocalizedString(@"view_settings_title", @"Settings");
 }
 
+-(void) gameInitNotification:(NSNotification *) notification
+{
+    if ([[[notification userInfo] objectForKey:@"admin"] boolValue])
+    {
+        AdminViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"AdminViewController"];
+        
+        [self presentViewController:viewController animated:YES completion:^{
+            [[NSNotificationCenter defaultCenter] removeObserver:self];
+        }];
+    }
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -115,9 +132,12 @@
 
 }
 
-
-- (BOOL)shouldAutorotate {
-    return NO;
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
+{
+    return (toInterfaceOrientation == UIDeviceOrientationLandscapeRight || toInterfaceOrientation == UIDeviceOrientationLandscapeLeft);
 }
+//- (BOOL)shouldAutorotate {
+//    return NO;
+//}
 
 @end

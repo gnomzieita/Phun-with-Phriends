@@ -24,10 +24,13 @@
 + (API*)sharedController;
 
 @property (strong, nonatomic) id<API_Delegat> delegat;
+@property (strong, nonatomic) ServerInfoObject* serverInf;
+
+- (void) closeConnect;
 
 - (void) initConnectWithServer:(NSString*)serverAddress Port:(UInt32)port;
 
-- (void) initConnectWithServerInfo:(ServerInfoObject*)serverInfo;
+- (BOOL) initConnectWithServerInfo:(ServerInfoObject*)serverInfo;
 
 - (void) selectCell:(NSInteger)cellnum path:(NSInteger)path;
 
@@ -46,5 +49,7 @@
 - (NSString*) objectToJSONString:(id)obj;
 
 - (void) popToTop:(void (^ __nullable)(void))completion;
+
+- (nullable UIViewController*)currentTopViewController;
 
 @end

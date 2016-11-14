@@ -34,7 +34,9 @@
     NSString* token;
     NSString* gameUserName;
     NSUserDefaults* userDef;
+    
 }
+
 @end
 
 @implementation API
@@ -61,6 +63,7 @@ static API *_sharedController = nil;
     if ([userDef objectForKey:@"token"]) {
         [self initConnectWithServer:[userDef objectForKey:@"serverAddress"] Port:[[userDef objectForKey:@"serverPort"] intValue]];
     }
+    
     if ([userDef objectForKey:@"userName"]) {
         [self setUserName:[userDef objectForKey:@"userName"]];
     }
@@ -131,9 +134,9 @@ static API *_sharedController = nil;
      */
     
     [dict setObject:@"init" forKey:@"command"];
-    //[dict setObject:[UIDevice currentDevice].identifierForVendor.UUIDString forKey:@"device_id"];
+    [dict setObject:[UIDevice currentDevice].identifierForVendor.UUIDString forKey:@"device_id"];
     
-    [dict setObject:@"lol" forKey:@"device_id"];
+    //[dict setObject:@"lol" forKey:@"device_id"];
     
     [dict setObject:@"TestGame" forKey:@"game_id"];
     [dict setObject:[NSNumber numberWithInt:1] forKey:@"game_version"];
@@ -242,8 +245,25 @@ static API *_sharedController = nil;
     
 }
 
-- (void) initConnectWithServerInfo:(ServerInfoObject*)serverInfo
+- (BOOL) initConnectWithServerInfo:(ServerInfoObject*)serverInfo
 {
+    
+    [NSThread sleepForTimeInterval:.5];
+    if (serverInfo) {
+        _serverInf = serverInfo;
+    }
+    else
+    {
+       // [userDef setObject:serverAddress forKey:@"serverAddress"];
+        //[userDef setObject:[NSNumber numberWithInteger:port] forKey:@"serverPort"];
+        
+        NSString* ip = [userDef objectForKey:@"serverAddress"];
+        UInt32 port = [[userDef objectForKey:@"serverPort"] integerValue];
+        if (ip && port) {
+            [self initConnectWithServer:_serverInf.ip Port:[_serverInf.port intValue]];
+            return YES;
+        }
+    }
     NSString *currentSSID = @"";
     CFArrayRef myArray = CNCopySupportedInterfaces();
     if (myArray != nil){
@@ -264,21 +284,29 @@ static API *_sharedController = nil;
      ssid = "Alex's MacBook Pro";
      */
 #warning SSID CHEK OFF
-    if ([serverInfo.ssid isEqualToString: currentSSID]) {
-        [self initConnectWithServer:serverInfo.ip Port:[serverInfo.port intValue]];
+    if ([_serverInf.ssid isEqualToString: currentSSID]) {
+        
+        [self initConnectWithServer:_serverInf.ip Port:[_serverInf.port intValue]];
+        return YES;
     }
     else
     {
         NSLog(@"NE TOT SSID!!");
 
         
-        [self showErrorMessage:@"NE TOT SSID!!" handler:^(UIAlertAction *action) {
-            WCScanViewController* vc = (WCScanViewController*)[self currentTopViewController];
-            [vc startStopReading];
-        }];
+        return NO;
         
     }
-    
+    return NO;
+}
+- (void) closeConnect
+{
+    token = nil;
+    [serverTimer invalidate];
+    serverTimer = nil;
+    [userDef removeObjectForKey:@"token"];
+    [inputStream close];
+    [outputStream open];
 }
 
 - (void) initConnectWithServer:(NSString*)serverAddress Port:(UInt32)port
@@ -300,12 +328,13 @@ static API *_sharedController = nil;
     [outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [inputStream open];
     [outputStream open];
-    
+    //[self playSound:API_Sound_DoorSlam];
     serverTimer = [NSTimer scheduledTimerWithTimeInterval:0.5
                                                    target:self
                                                  selector:@selector(sendLeave)
                                                  userInfo:nil
                                                   repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:serverTimer forMode:NSDefaultRunLoopMode];
     
     if ([userDef objectForKey:@"token"])
     {
@@ -330,20 +359,22 @@ static API *_sharedController = nil;
 - (void) sendLeave {
     
     [self sendMessage:@"!"];
-    //NSLog(@"!");
+    NSLog(@"!");
     //[self sendInitServerComand];
     
 }
 
 - (void) sendMessage:(NSString*)message {
     
-    NSString *response  = [NSString stringWithFormat:@"%@\r", message];
-    if (![message isEqualToString:@"!"]) {
-        NSLog(@"sendMessage: %@",response);
+    if (outputStream) {
+        NSString *response  = [NSString stringWithFormat:@"%@\r", message];
+        if (![message isEqualToString:@"!"]) {
+            NSLog(@"sendMessage: %@",response);
+        }
+        //NSLog(@"sendMessage: %@",response);
+        NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSUTF8StringEncoding]];
+        [outputStream write:[data bytes] maxLength:[data length]];
     }
-    //NSLog(@"sendMessage: %@",response);
-    NSData *data = [[NSData alloc] initWithData:[response dataUsingEncoding:NSUTF8StringEncoding]];
-    [outputStream write:[data bytes] maxLength:[data length]];
     
 }
 
@@ -397,11 +428,17 @@ static API *_sharedController = nil;
                                 if (nil != output) {
                                     
                                     //NSLog(@"server said: %@", output);
-                                    if (![output isEqualToString:@"!\r\n"]) {
-                                        [self messageReceived:output];
+                                    NSArray* tempArray = [NSArray arrayWithArray:[output componentsSeparatedByString:@"\r\n"]];
+                                    //NSLog(@"tempArray: %@",tempArray);
+                                    for (NSString* tempString in tempArray) {
+                                        if (![tempString isEqualToString:@"!"] && tempString.length>0) {
+                                            [self messageReceived:tempString];
+                                        }
+                                        else
+                                        {
+                                            NSLog(@"tempString:%@",tempString);
+                                        }
                                     }
-
-                                    
                                 }
                             }
                         }
@@ -447,7 +484,6 @@ static API *_sharedController = nil;
             theStream = nil;
             [serverTimer invalidate];
             [self popToTop:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
         case NSStreamStatusClosed:
             NSLog(@"NSStreamStatusClosed");
@@ -456,7 +492,6 @@ static API *_sharedController = nil;
             theStream = nil;
             [serverTimer invalidate];
             [self popToTop:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
         case NSStreamStatusError:
             NSLog(@"NSStreamStatusError");
@@ -468,10 +503,9 @@ static API *_sharedController = nil;
             theStream = nil;
             [serverTimer invalidate];
             
-            [self showErrorMessage:[NSString stringWithFormat:@"streamError: %@",theStream.streamError] handler:nil];
+            //[self showErrorMessage:[NSString stringWithFormat:@"streamError: %@",theStream.streamError] handler:nil];
             
             [self popToTop:nil];
-            [[NSNotificationCenter defaultCenter] postNotificationName:@"streamEnd" object:nil];
             break;
             
         default:
@@ -489,14 +523,6 @@ static API *_sharedController = nil;
     [view dismissViewControllerAnimated:YES completion:completion];
 }
 
-/*
- settings_sync – синхронизация настроек между сервером и клиентом. Работает так же как и start, но не начинает игру. Может быть отправлена в любой момент
- 
- {"response":"settings_sync",”game_type”:0,”card_type”:0,”user_shuffle”:true, "rotate_count":0, "rotate_vector":0 }
- 
- {"command":"settings_sync",”game_type”:0,”card_type”:0,”user_shuffle”:true, "rotate_count":0, "rotate_vector":0 }
-
- */
 - (void) messageReceived:(NSString *)message
 {
 
@@ -516,9 +542,11 @@ static API *_sharedController = nil;
         {
             token = [responseDict objectForKey:@"token"];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gameInit" object:self userInfo:responseDict];
+            //[self playSound:API_Sound_idle];
         }
         else
         {
+            [userDef removeObjectForKey:@"token"];
             [self showErrorMessage:[responseDict objectForKey:@"error"] handler:nil];
         }
     }
@@ -527,11 +555,12 @@ static API *_sharedController = nil;
         /*{"admin":false,"response":"start"}*/
         if (![responseDict objectForKey:@"error"]) {
             [userDef setObject:token forKey:@"token"];
-            
+            //[self playSound:API_Sound_GameStart];
             [[NSNotificationCenter defaultCenter] postNotificationName:@"gameStart" object:self];
         }
         else
         {
+            [userDef removeObjectForKey:@"token"];
             [self showErrorMessage:[responseDict objectForKey:@"error"] handler:nil];
         }
     }
@@ -541,14 +570,14 @@ static API *_sharedController = nil;
         
         NSLog(@"response action %@",responseDict);
         if ([[responseDict objectForKey:@"game_cmd"] isEqualToString:@"init_pos"]) {
-            if ([[responseDict objectForKey:@"game_cmd"] isEqualToString:@"error"])
+            if ([responseDict objectForKey:@"error"])
             {
-                
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"gameError" object:nil];
+                [userDef removeObjectForKey:@"token"];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"gameError" object:nil userInfo:responseDict];
             }
             else
             {
-                [[NSNotificationCenter defaultCenter] postNotificationName:@"gameAction" object:nil];
+                [[NSNotificationCenter defaultCenter] postNotificationName:@"gameAction" object:nil userInfo:responseDict];
             }
             
         }
@@ -563,9 +592,23 @@ static API *_sharedController = nil;
         }
         else if ([[responseDict objectForKey:@"game_cmd"] isEqualToString:@"game_over"])
         {
+            
             [userDef removeObjectForKey:@"token"];
-            //“game_over”:false
             [[NSNotificationCenter defaultCenter] postNotificationName:@"game_over" object:nil userInfo:responseDict];
+        }
+        else if ([[responseDict objectForKey:@"game_cmd"] isEqualToString:@"game_close"])
+        {
+            
+            [userDef removeObjectForKey:@"token"];
+            [self popToTop:nil];
+        }
+        else if ([[responseDict objectForKey:@"game_cmd"] isEqualToString:@"game_new"])
+        {
+            [userDef removeObjectForKey:@"token"];
+            [self closeConnect];
+//            [self popToTop:^{
+//                //[self initConnectWithServerInfo:nil];
+//            }];
         }
     }
     else if ([[responseDict objectForKey:@"response"] isEqualToString:@"back"]){
@@ -630,7 +673,7 @@ static API *_sharedController = nil;
     gameUserName = userName;
 }
 
-- (void) showErrorMessage:(NSString*)errorString  handler:(void (^ __nullable)(UIAlertAction *action))handler
+- (void) showErrorMessage:(NSString*)errorString  handler:(void (^)(UIAlertAction *action))handler
 {
     UIAlertController* alertControl = [UIAlertController alertControllerWithTitle:@"Error!" message:errorString preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction* okAction = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:handler];
@@ -650,4 +693,5 @@ static API *_sharedController = nil;
     }
     return topVC;
 }
+
 @end

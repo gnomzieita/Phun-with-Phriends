@@ -9,15 +9,29 @@
 #import "SelectStartCellViewController.h"
 #import "API.h"
 #import "GameViewController.h"
+#import "MyLabel.h"
+#import <AVFoundation/AVFoundation.h>
 
-@interface SelectStartCellViewController ()<UIActionSheetDelegate>
+@interface SelectStartCellViewController ()<UIActionSheetDelegate, AVAudioPlayerDelegate>
 {
     API *myAPI;
     UIButton* tapButton;
+    NSTimer* sirenaTimer;
+    BOOL roundButtonFlag;
+    
 }
+@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *carsArray;
+@property (weak, nonatomic) IBOutlet UIView *waitView;
 
 - (IBAction)buttonTap:(id)sender;
 @property (weak, nonatomic) IBOutlet UIView *kub;
+@property (strong, nonatomic) IBOutletCollection(UIView) NSArray *vw;
+
+@property (weak, nonatomic) IBOutlet UILabel *orLabel;
+@property (weak, nonatomic) IBOutlet UIButton *redButton;
+@property (weak, nonatomic) IBOutlet UIButton *blueButton;
+@property (strong, nonatomic) PWPPlayer* myPlayer;
+
 
 @end
 
@@ -25,7 +39,81 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [[UIDevice currentDevice] setValue:
+     [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft]
+                                forKey:@"orientation"];
+    _myPlayer = PLAYER_INIT;
+    CGFloat step = 194/18.0f;
+    for (int x=0; x<18; x++) {
+        for (int y = 0; y<2; y++) {
+            if (x%3 != 0) {
+                UIView* roundView = [[UIView alloc] initWithFrame:CGRectMake(step*x+4, step*y*18+4, 8, 8)];
+                roundView.layer.cornerRadius = 4;
+
+                if (x%3 == 1) {
+                    if (y == 1) {
+                        roundView.layer.backgroundColor = [UIColor blueColor].CGColor;
+                    }
+                    else
+                    {
+                        roundView.layer.backgroundColor = [UIColor redColor].CGColor;
+                    }
+                }
+                else
+                {
+                    if (y == 1) {
+                        roundView.layer.backgroundColor = [UIColor redColor].CGColor;
+                    }
+                    else
+                    {
+                        roundView.layer.backgroundColor = [UIColor blueColor].CGColor;
+                    }
+                }
+                [_kub addSubview:roundView];
+            }
+        }
+    }
+    for (int y=0; y<18; y++) {
+        for (int x = 0; x<2; x++) {
+            if (y%3 != 0) {
+                UIView* roundView = [[UIView alloc] initWithFrame:CGRectMake(step*x*18+4, step*y+4, 8, 8)];
+                roundView.layer.cornerRadius = 4;
+                if (y%3 == 1) {
+                    if (x == 1) {
+                        roundView.layer.backgroundColor = [UIColor redColor].CGColor;
+                    }
+                    else
+                    {
+                        roundView.layer.backgroundColor = [UIColor blueColor].CGColor;
+                    }
+                }
+                else
+                {
+                    if (x == 1) {
+                        roundView.layer.backgroundColor = [UIColor blueColor].CGColor;
+                    }
+                    else
+                    {
+                        roundView.layer.backgroundColor = [UIColor redColor].CGColor;
+                    }
+                }
+                [_kub addSubview:roundView];
+            }
+        }
+    }
+    [_orLabel setStrokeText:NSLocalizedString(@"OR",@"OR")];
     
+    for (UIView* view in _vw) {
+        if (view.tag > 0) {
+         [view setBackgroundColor:[UIColor whiteColor]];
+        }
+        else
+        {
+            [view setBackgroundColor:[UIColor clearColor]];
+        }
+        [view.layer setBorderColor:[UIColor blackColor].CGColor];
+        [view.layer setBorderWidth:1.0f];
+    }
     [[UIDevice currentDevice] setValue:
      [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft]
                                 forKey:@"orientation"];
@@ -37,18 +125,79 @@
                                                  name:@"gameAction"
                                                object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(gameError)
+                                             selector:@selector(gameError:)
                                                  name:@"gameError"
                                                object:nil];
-//    float h = (_kub.frame.size.height+_kub.frame.size.width)/12;
-//    for (int x = 0; x<6; x++) {
-//        for (int y=0; y<6; y++) {
-//            UIView* kubViev = [[UIView alloc] initWithFrame:CGRectMake(h*x, h*y, h, h)];
-//            kubViev.layer.borderWidth = 1;
-//            kubViev.layer.borderColor = [UIColor blackColor].CGColor;
-//            [_kub addSubview:kubViev];
-//        }
-//    }
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(startGame:)
+                                                 name:@"cardInit"
+                                               object:nil];
+    
+    sirenaTimer = [NSTimer scheduledTimerWithTimeInterval:20.0f
+                                                  target:self
+                                                selector:@selector(policeSirene)
+                                                userInfo:nil
+                                                 repeats:NO];
+    [[NSRunLoop currentRunLoop] addTimer:sirenaTimer forMode:NSDefaultRunLoopMode];
+    
+}
+
+- (void) startGame:(NSNotification *) notification
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_myPlayer stopPlay];
+    _myPlayer = nil;
+    GameViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"GameViewController"];
+    [viewController gameInitNotification:notification];
+    [[UIDevice currentDevice] setValue:
+     [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft]
+                                forKey:@"orientation"];
+    [self presentViewController:viewController animated:YES completion:nil];
+}
+
+- (void) policeSirene
+{
+    [_myPlayer playSound:API_Sound_HurryUp];
+    [sirenaTimer invalidate];
+    sirenaTimer = nil;
+    
+    for (UIButton* tempButton in _carsArray) {
+        if (tempButton.tag %2 == 0 ) {
+            [tempButton setSelected:YES];
+        }
+        else
+        {
+            [tempButton setSelected:NO];
+        }
+    }
+    [self animCars];
+}
+- (void) animCars
+{
+    [UIView animateWithDuration:2 animations:^
+     {
+         for (UIButton* tempButton in _carsArray) {
+             [tempButton setSelected:!tempButton.selected];
+         }
+     }
+    completion:^(BOOL finished) {
+        if (!tapButton) {
+            [self animCars];
+        }
+        else
+        {
+            for (UIButton* tempButton in _carsArray) {
+                if (tempButton == tapButton ) {
+                    [tempButton setSelected:YES];
+                }
+                else
+                {
+                    [tempButton setSelected:NO];
+                }
+            }
+        }
+    }];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -56,16 +205,14 @@
     // Dispose of any resources that can be recreated.
 }
 
-- (void) gameError
+- (void) gameError:(NSNotification *) notification
 {
-    
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Ошибка!",@"Ошибка!")
-                                                                   message:NSLocalizedString(@"Данный путь занят",@"Данный путь занят")
+    [notification.userInfo objectForKey:@"error"];
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Error!",@"Error!")
+                                                                   message:[notification.userInfo objectForKey:@"error"]
                                                             preferredStyle:UIAlertControllerStyleAlert]; // 1
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Ясно и понятно))",@"Ясно и понятно))")
-                                                          style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {
-                
-                                                          }]; // 2
+    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Ok",@"Ok")
+                                                          style:UIAlertActionStyleDestructive handler:nil]; // 2
     
     [alert addAction:firstAction]; // 4
     [alert setModalPresentationStyle:UIModalPresentationPopover];
@@ -84,37 +231,102 @@
 
 - (IBAction)buttonTap:(id)sender
 {
+    
     tapButton = (UIButton*)sender;
+    for (UIButton* tempButton in _carsArray) {
+        if (tempButton == tapButton ) {
+            [tempButton setSelected:YES];
+        }
+        else
+        {
+            [tempButton setSelected:NO];
+        }
+    }
     
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Выбор стартовой точки.",@"Выбор стартовой точки.")
-                                                                   message:NSLocalizedString(@"Откуда вы хотите начать?",@"Откуда вы хотите начать?")
-                                                            preferredStyle:UIAlertControllerStyleActionSheet]; // 1
-    UIAlertAction *firstAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Начать с 1",@"Начать с 1")
-                                                          style:UIAlertActionStyleDestructive handler:^(UIAlertAction * action) {
-                                                              NSInteger doorNum = tapButton.tag<7?1:(tapButton.tag<13?3:(tapButton.tag<19?5:7));
-                                                              [myAPI selectCell:tapButton.tag path:doorNum];
-                                                          }]; // 2
-    UIAlertAction *secondAction = [UIAlertAction actionWithTitle:NSLocalizedString(@"Начать с 2",@"Начать с 2")
-                                                           style:UIAlertActionStyleDefault handler:^(UIAlertAction * action) {
-                                                               NSInteger doorNum = tapButton.tag<7?2:(tapButton.tag<13?4:(tapButton.tag<19?6:8));
-                                                               [myAPI selectCell:tapButton.tag path:doorNum];
-                                                           }]; // 3
+    [_myPlayer stopPlay];
+    [_myPlayer playSound:API_Sound_idle];
     
-    [alert addAction:firstAction]; // 4
-    [alert addAction:secondAction]; // 5
-    
-    [self presentViewController:alert animated:YES completion:nil]; // 6
+    [sirenaTimer invalidate];
+    sirenaTimer = nil;
+    sirenaTimer = [NSTimer scheduledTimerWithTimeInterval:20.0
+                                                   target:self
+                                                 selector:@selector(policeSireneRoundButtons)
+                                                 userInfo:nil
+                                                  repeats:NO];
+
 }
 
--(void) gameInitNotification:(NSNotification *) notification {
-    GameViewController* viewController = [self.storyboard instantiateViewControllerWithIdentifier:@"GameViewController"];
-    [self presentViewController:viewController animated:YES completion:^{
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
-    }];
+- (void) policeSireneRoundButtons
+{
+    [_myPlayer playSound:API_Sound_HurryUp];
+    [_redButton setHighlighted:!_redButton.highlighted];
+    [self redBlueButtonAnimm];
+}
+
+- (void) redBlueButtonAnimm
+{
+    [UIView animateWithDuration:1 delay:0 options:UIViewAnimationOptionRepeat animations:^
+     {
+         [_redButton setHighlighted:!_redButton.highlighted];
+         [_blueButton setHighlighted:!_blueButton.highlighted];
+     }
+    completion:^(BOOL finished)
+     {
+         if (!roundButtonFlag) {
+             [self redBlueButtonAnimm];
+         }
+     }];
+}
+
+-(void) gameInitNotification:(NSNotification *) notification
+{
+    if ([[notification.userInfo objectForKey:@"result"] boolValue]) {
+        [_myPlayer stopPlay];
+        _myPlayer = nil;
+        [_waitView setHidden:NO];
+    }
 }
 
 - (BOOL)shouldAutorotate {
     return NO;
+}
+
+- (IBAction)redButtonTap:(id)sender
+{
+    if (tapButton) {
+        [_myPlayer stopPlay];
+        _myPlayer = nil;
+        NSInteger doorNum = tapButton.tag<7?1:(tapButton.tag<13?3:(tapButton.tag<19?5:7));
+        [myAPI selectCell:tapButton.tag path:doorNum];
+        
+        roundButtonFlag = YES;
+        [sirenaTimer invalidate];
+        sirenaTimer = nil;
+    }
+}
+
+- (IBAction)blueButtonTap:(id)sender
+{
+    if (tapButton) {
+        [_myPlayer stopPlay];
+        _myPlayer = nil;
+        NSInteger doorNum = tapButton.tag<7?2:(tapButton.tag<13?4:(tapButton.tag<19?6:8));
+        [myAPI selectCell:tapButton.tag path:doorNum];
+        
+        roundButtonFlag = YES;
+        [sirenaTimer invalidate];
+        sirenaTimer = nil;
+    }
+
+}
+
+- (void) dealloc
+{
+    _myPlayer = nil;
+    myAPI = nil;
+    
+    [sirenaTimer invalidate];
+    sirenaTimer = nil;
 }
 
 @end

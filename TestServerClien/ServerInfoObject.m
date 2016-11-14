@@ -15,15 +15,15 @@
     _gid = [dictInfo objectForKey:@"gid"];
     _gv = [dictInfo objectForKey:@"gv"];
     
-#if DEBUG
+//#if DEBUG
     
     #  warning TEST IP
     //_ip = @"100.100.0.34";
-    _ip = @"192.168.2.24";
+    //_ip = @"192.168.2.24";
     
-#else
+//#else
     _ip = [dictInfo objectForKey:@"ip"];
-#endif
+//#endif
     //_ip = [dictInfo objectForKey:@"ip"];
     _port = [dictInfo objectForKey:@"port"];
     _ssid = [dictInfo objectForKey:@"ssid"];

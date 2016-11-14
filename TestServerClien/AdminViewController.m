@@ -25,7 +25,7 @@
     NSInteger rotate_count;
     NSInteger rotate_vector;
     NSInteger user_shuffle;
-    
+    PWPPlayer* player;
     API* myAPI;
 }
 @property (weak, nonatomic) IBOutlet UICollectionView *table;
@@ -34,7 +34,9 @@
 
 - (IBAction)backTap:(id)sender;
 
-@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *anim;
+- (IBAction)leftButtonTap:(id)sender;
+- (IBAction)rightButtonTap:(id)sender;
+
 
 @end
 
@@ -42,7 +44,6 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [_anim startAnimating];
     myAPI = [API sharedController];
     //[self hideShowButton];
 
@@ -72,7 +73,7 @@
                                              selector:@selector(settings_sync:)
                                                  name:@"settings_sync"
                                                object:nil];
-    [self startButtonTap:nil];
+   // [self startButtonTap:nil];
    // _startButton.layer.cornerRadius = 10.f;
 }
 
@@ -136,6 +137,7 @@
 
 - (IBAction)backTap:(id)sender
 {
+    [myAPI closeConnect];
     [myAPI popToTop:^{
         [[NSNotificationCenter defaultCenter] removeObserver:self];
     }];
@@ -280,5 +282,78 @@
     [dict setObject:[NSNumber numberWithInteger:rotate_vector] forKey:@"rotate_vector"];
     
     [myAPI sendMessage:[myAPI objectToJSONString:dict] ];
+}
+
+/*
+ 
+ */
+- (IBAction)leftButtonTap:(id)sender
+{
+    NSArray* tempArray = [NSArray arrayWithArray:[_table indexPathsForVisibleItems]];
+    NSIndexPath* tempPach = [tempArray lastObject];
+    switch (tempPach.item) {
+        case 0:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:3 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 1:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 2:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 3:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+- (IBAction)rightButtonTap:(id)sender
+{
+    NSArray* tempArray = [NSArray arrayWithArray:[_table indexPathsForVisibleItems]];
+    NSIndexPath* tempPach = [tempArray lastObject];
+    switch (tempPach.item) {
+        case 0:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:1 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 1:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:2 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 2:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:3 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+        case 3:
+        {
+            [_table scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0]
+                           atScrollPosition:UICollectionViewScrollPositionNone animated:YES];
+        }
+            break;
+            
+        default:
+            break;
+    }
 }
 @end

@@ -11,6 +11,8 @@
 #import "API.h"
 #import <Chartboost/Chartboost.h>
 #import "ViewController.h"
+#import "MyLabel.h"
+#import "WCScanViewController.h"
 
 #define UIColorFromRGB(rgbValue) \
 [UIColor colorWithRed:((float)((rgbValue & 0xFF0000) >> 16))/255.0 \
@@ -24,15 +26,27 @@ alpha:1.0]
     NSArray* rotateArray;
     UIColor* roadColor;
 }
+@property (weak, nonatomic) IBOutlet UIImageView *gameEndImage;
+
+- (IBAction)mainMenuButtonTap:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *mainMenuButton;
+
+- (IBAction)newGameButtonTab:(id)sender;
+@property (weak, nonatomic) IBOutlet UIButton *nGameButton;
+
 @property (weak, nonatomic) IBOutlet GameCardView *card_1;
 @property (weak, nonatomic) IBOutlet GameCardView *card_2;
 @property (weak, nonatomic) IBOutlet GameCardView *card_3;
 @property (strong, nonatomic) IBOutlet GameCardView *selectCard;
+
 @property (weak, nonatomic) IBOutlet UILabel *NextStepName;
+@property (weak, nonatomic) IBOutlet UILabel *congratsLabel;
 
 @property (weak, nonatomic) IBOutlet GameCardView *cardTemp;
 
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activity;
+
+@property (weak, nonatomic) IBOutlet UIView *gameWinView;
 
 @property (assign, nonatomic) CGRect tempRect;
 @property (assign, nonatomic) NSInteger roadStart;
@@ -54,6 +68,32 @@ alpha:1.0]
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSLog(@"GameViewController viewDidLoad");
+    NSDictionary *typingAttributes = @{
+                                       NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:17.0f],
+                                       NSForegroundColorAttributeName : [UIColor whiteColor],
+                                       NSStrokeColorAttributeName : [UIColor colorWithRed:255.0f/255.0f green:140.0f/255.0f blue:24.0f/255.0f alpha:1.0f],
+                                       NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                                       };
+    NSAttributedString *str = [[NSAttributedString alloc]
+                               initWithString:NSLocalizedString(@"Main Menu",@"Main Menu")
+                               attributes:typingAttributes];
+    
+    [_mainMenuButton setAttributedTitle:str forState:UIControlStateNormal];
+    
+    typingAttributes = @{
+                         NSFontAttributeName: [UIFont fontWithName:@"CarterOne" size:17.0f],
+                         NSForegroundColorAttributeName : [UIColor whiteColor],
+                         NSStrokeColorAttributeName : [UIColor colorWithRed:95.0f/255.0f green:22.0f/255.0f blue:161.0f/255.0f alpha:1.0f],
+                         NSStrokeWidthAttributeName : [NSNumber numberWithFloat:-5.0]
+                         };
+    str = [[NSAttributedString alloc]
+           initWithString:NSLocalizedString(@"New Game",@"New Game")
+           attributes:typingAttributes];
+    
+    [_nGameButton setAttributedTitle:str forState:UIControlStateNormal];
+    
+    [_congratsLabel setStrokeText:@"Congrats! You’ve made it."];
     
     [[UIDevice currentDevice] setValue:
      [NSNumber numberWithInteger: UIInterfaceOrientationLandscapeLeft]
@@ -76,12 +116,14 @@ alpha:1.0]
                                              selector:@selector(game_over:)
                                                  name:@"game_over"
                                                object:nil];
+    
+    [[API sharedController] sendMessage:[[API sharedController] objectToJSONString:@{@"command":@"action",@"game_cmd":@"info"}]];
 }
 
 - (void) gameEnd:(NSNotification *) notification
 {
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
-    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Игра оконченна",@"Игра оконченна") message:NSLocalizedString(@"Сообщение об окончании игры",@"Сообщение об окончании игры") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Game over!",@"Game over!") message:NSLocalizedString(@"Server left the game!",@"Server left the game!") preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* actionButtonOk = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -102,7 +144,7 @@ alpha:1.0]
 {
     BOOL isWinn = [[[notification userInfo] objectForKey:@"game_over"] boolValue];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"token"];
-    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Игра оконченна",@"Игра оконченна") message:isWinn?NSLocalizedString(@"Вы выиграли!",@"Вы выиграли!"):NSLocalizedString(@"Вы проиграли!",@"Вы проиграли!") preferredStyle:UIAlertControllerStyleAlert];
+    UIAlertController* alertController = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Game over!",@"Game over!") message:isWinn?NSLocalizedString(@"Вы выиграли!",@"Вы выиграли!"):NSLocalizedString(@"Вы проиграли!",@"Вы проиграли!") preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction* actionButtonOk = [UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         [[NSNotificationCenter defaultCenter] removeObserver:self];
@@ -130,23 +172,63 @@ alpha:1.0]
     }];
 }
 -(void) gameInitNotification:(NSNotification *) notification {
+    /*
+     {"admin":true,"card":[10,22,7],"color":-769226,"cur_user":"Samsung","game_cmd":"info","game_over":true,"path":8,"response":"action","rotating":[false,false,false],"step":false,"user_win":true}
+     */
+    NSLog(@"gameInitNotification: %@",notification.userInfo);
     [_activity stopAnimating];
-    NSLog(@"User info %@", notification.userInfo);
-    NSArray* cardArray = [NSArray arrayWithArray:[notification.userInfo objectForKey:@"card"]];
-    NSLog(@"cardArray %@", cardArray);
-    _rotate = 0;
-    _cardArray = cardArray;
-    rotateArray = [NSArray arrayWithArray:[notification.userInfo objectForKey:@"rotating"]];
-    _roadStart = [[notification.userInfo objectForKey:@"path"] integerValue];
-    //
-    [_NextStepName setText:[NSString stringWithFormat:NSLocalizedString(@"Следующим ходит: %@",@"Следующим ходит: "),[notification.userInfo objectForKey:@"cur_user"]]];
-    roadColor = UIColorFromRGB([[notification.userInfo objectForKey:@"color"] integerValue]);
-    [self.view setBackgroundColor:roadColor];
-    _card_1.roadColor = roadColor;
-    _card_2.roadColor = roadColor;
-    _card_3.roadColor = roadColor;
-    _selectCard.roadColor = roadColor;
-    [self loadCard];
+    
+    if ([[notification.userInfo objectForKey:@"game_over"] boolValue]) {
+        [_selectCard removeFromSuperview];
+        if ([[notification.userInfo objectForKey:@"user_win"] boolValue])
+        {
+            [_congratsLabel setHidden:NO];
+            [_gameEndImage setImage:[UIImage imageNamed:@"game_win"]];
+            if (![[notification.userInfo objectForKey:@"admin"] boolValue]) {
+                [_nGameButton setHidden:YES];
+                [_mainMenuButton setHidden:YES];
+            }
+            [_gameWinView setHidden:NO];
+        }
+        else
+        {
+            [_congratsLabel setHidden:YES];
+            [_gameEndImage setImage:[UIImage imageNamed:@"game_end"]];
+            if (![[notification.userInfo objectForKey:@"admin"] boolValue]) {
+                [_nGameButton setHidden:YES];
+                [_mainMenuButton setHidden:YES];
+            }
+            [_gameWinView setHidden:NO];
+        }
+    }
+    else
+    {
+        NSLog(@"User info %@", notification.userInfo);
+        NSArray* cardArray = [NSArray arrayWithArray:[notification.userInfo objectForKey:@"card"]];
+        NSLog(@"cardArray %@", cardArray);
+        _rotate = 0;
+        _cardArray = cardArray;
+        rotateArray = [NSArray arrayWithArray:[notification.userInfo objectForKey:@"rotating"]];
+        _roadStart = [[notification.userInfo objectForKey:@"path"] integerValue];
+        //
+        if ([[notification.userInfo objectForKey:@"step"] boolValue]) {
+            [_NextStepName setText:[NSString stringWithFormat:NSLocalizedString(@"Select Card",@"Select Card")]];
+            [_okButton setHidden:NO];
+        }
+        else
+        {
+            [_NextStepName setText:[NSString stringWithFormat:NSLocalizedString(@"Waiting for %@",@"Waiting for %@"),[notification.userInfo objectForKey:@"cur_user"]]];
+            [_okButton setHidden:YES];
+        }
+        
+        roadColor = UIColorFromRGB([[notification.userInfo objectForKey:@"color"] integerValue]);
+        [self.view setBackgroundColor:roadColor];
+        _card_1.roadColor = roadColor;
+        _card_2.roadColor = roadColor;
+        _card_3.roadColor = roadColor;
+        _selectCard.roadColor = roadColor;
+        [self loadCard];
+    }
 }
 
 - (void) loadCard
@@ -195,16 +277,16 @@ alpha:1.0]
 }
 */
 
-- (void) reloadCard:(GameCardView*)gameCard oldCard:(GameCardView*)oldCard withType:(GameCardType)cardType
-{
-    GameCardView* view = [[GameCardView alloc] initWithFrame:oldCard.frame];
-    [view setType:cardType startRoad:_roadStart rotate:_rotate];
-    
-    [oldCard removeFromSuperview];
-    oldCard = nil;
-    [self.view addSubview:view];
-    oldCard = view;
-}
+//- (void) reloadCard:(GameCardView*)gameCard oldCard:(GameCardView*)oldCard withType:(GameCardType)cardType
+//{
+//    GameCardView* view = [[GameCardView alloc] initWithFrame:oldCard.frame];
+//    [view setType:cardType startRoad:_roadStart rotate:_rotate];
+//    
+//    [oldCard removeFromSuperview];
+//    oldCard = nil;
+//    [self.view addSubview:view];
+//    oldCard = view;
+//}
 
 - (void) setSelectedCard:(GameCardView *)selectCard
 {
@@ -223,69 +305,46 @@ alpha:1.0]
 }
 - (IBAction)card_1_tap:(id)sender
 {
-//    [UIView animateWithDuration:1 animations:^{
-//
-//        _cardTemp = _card_1;
-//        
-//        [_card_1 setFrame:_selectCard.frame];
-//        
-//        //[_selectCard setFrame:_tempRect];
-//        
-//    } completion:^(BOOL finished) {
         _rotate = 0;
         GameCardView* view = [[GameCardView alloc] initWithFrame:_selectCard.frame];
         [view setType:_card_1.cardType startRoad:_card_1.startRoad rotate:_rotate];
         view.isRotatingCard = _card_1.isRotatingCard;
+        view.roadColor = _card_1.roadColor;
+    
         [_selectCard removeFromSuperview];
         
         [self.view addSubview:view];
         _selectCard = view;
     [self setSelectedCard:_card_1];
-//    }];
 }
 
 - (IBAction)card_2_tap:(id)sender
 {
-//    [UIView animateWithDuration:1 animations:^{
-//        _tempRect = _card_2.frame;
-//        
-//        [_card_2 setFrame:_selectCard.frame];
-//        
-//        [_selectCard setFrame:_tempRect];
-//        
-//    } completion:^(BOOL finished) {
         _rotate = 0;
         GameCardView* view = [[GameCardView alloc] initWithFrame:_selectCard.frame];
         [view setType:_card_2.cardType startRoad:_card_2.startRoad rotate:_rotate];
         view.isRotatingCard = _card_2.isRotatingCard;
+    view.roadColor = _card_2.roadColor;
         [_selectCard removeFromSuperview];
         
         [self.view addSubview:view];
         _selectCard = view;
     [self setSelectedCard:_card_2];
-//    }];
 }
 
 - (IBAction)card_3_tap:(id)sender
 {
-//    [UIView animateWithDuration:1 animations:^{
-//        _tempRect = _card_3.frame;
-//        
-//        [_card_3 setFrame:_selectCard.frame];
-//        
-//        //[_selectCard setFrame:_tempRect];
-//        
-//    } completion:^(BOOL finished) {
         _rotate = 0;
         GameCardView* view = [[GameCardView alloc] initWithFrame:_selectCard.frame];
         [view setType:_card_3.cardType startRoad:_card_3.startRoad rotate:_rotate];
         view.isRotatingCard = _card_3.isRotatingCard;
+    view.roadColor = _card_3.roadColor;
+    
         [_selectCard removeFromSuperview];
         
         [self.view addSubview:view];
         _selectCard = view;
     [self setSelectedCard:_card_3];
-//    }];
 }
 
 - (IBAction)ok:(id)sender
@@ -304,6 +363,7 @@ alpha:1.0]
         GameCardView* view = [[GameCardView alloc] initWithFrame:_selectCard.frame];
         [view setType:_selectCard.cardType startRoad:_selectCard.startRoad rotate:_rotate];
         view.isRotatingCard = _selectCard.isRotatingCard;
+        view.roadColor = _selectCard.roadColor;
         [_selectCard removeFromSuperview];
         
         [self.view addSubview:view];
@@ -321,6 +381,7 @@ alpha:1.0]
         GameCardView* view = [[GameCardView alloc] initWithFrame:_selectCard.frame];
         [view setType:_selectCard.cardType startRoad:_selectCard.startRoad rotate:_rotate];
         view.isRotatingCard = _selectCard.isRotatingCard;
+        view.roadColor = _selectCard.roadColor;
         [_selectCard removeFromSuperview];
         
         [self.view addSubview:view];
@@ -333,4 +394,25 @@ alpha:1.0]
     return NO;
 }
 
+- (IBAction)newGameButtonTab:(id)sender
+{
+//    “command”:” action”,
+//    “game_cmd”:”game_new”
+    [_gameWinView removeFromSuperview];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    API* myApi = [API sharedController];
+    [myApi sendMessage:[myApi objectToJSONString:@{@"command":@"action",@"game_cmd":@"game_new"}]];
+    [myApi popToTop:^{
+        NSLog(@"Pop to top ok");
+        [[API sharedController] initConnectWithServerInfo:nil];
+    }];
+
+}
+- (IBAction)mainMenuButtonTap:(id)sender
+{
+     [_gameWinView removeFromSuperview];
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    API* myApi = [API sharedController];
+    [myApi sendMessage:[myApi objectToJSONString:@{@"command":@"action",@"game_cmd":@"game_close"}]];
+}
 @end
