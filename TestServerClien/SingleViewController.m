@@ -67,14 +67,23 @@
         NSMutableArray* temprray = [NSMutableArray array];
         for (int x = 0; x<6; x++) {
             GameCardView* view = [_kubiki objectAtIndex:y*6+x];
+            //GameCardView* view = [[GameCardView alloc] initWithFrame:tv.frame];
             view.layer.borderWidth = 1.0f;
             view.layer.borderColor = [UIColor blackColor].CGColor;
             [view setBackgroundColor:[UIColor whiteColor]];
             [view setType:GameCardType_0 startRoad:0 rotate:NO];
             [temprray addObject:view];
+            [_kubPole addSubview:view];
         }
         [_map addObject:temprray];
     }
+    [self getRandomStart];
+    
+    [self genNextCard];
+}
+
+- (void) getRandomStart
+{
     startX = arc4random()%6;
     if (startX == 0 || startX == 5) {
         startY = arc4random()%6;
@@ -108,8 +117,6 @@
     }
     
     startR = [[tempStartArray objectAtIndex:(arc4random()%(tempStartArray.count))] integerValue];
-    //[self nextStepSetType:arc4random()%35+1];
-    [self genNextCard];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -155,6 +162,7 @@
             break;
             
         default:
+            NSLog(@"BEDA!!");
             return 0;
             break;
     }
@@ -168,7 +176,7 @@
         
         GameCardView* view = [[GameCardView alloc] initWithFrame:tempView.frame];
         view.pointArray = tempView.pointArray;
-        [view setType:cardType startRoad:startR rotate:_rotate];
+        [view setType:cardType startRoad:startR rotate:tempView.rotate];
         
         [tempView removeFromSuperview];
         
@@ -179,8 +187,8 @@
     {
          [tempView setType:cardType startRoad:startR rotate:_rotate];
     }
-    NSInteger temp = [[[tempView.cardTable objectForKey:[NSNumber numberWithInteger:cardType]] objectAtIndex:((startR+_rotate*2)>8?(startR+_rotate*2)%8:(startR+_rotate*2))-1] integerValue];
-    //temp = (startR+_rotate*2)>8?(startR+_rotate*2)%8:(startR+_rotate*2);
+    NSInteger temp = [tempView getTo:startR];
+    _rotate = 0;
     BOOL flag = YES;
     switch ((temp-1)/2) {
         case 0:
@@ -257,12 +265,49 @@
             [self nextStepSetType:tV.cardType];
         }
     }
+    else
+    {
+        [self gameOver];
+    }
+}
+
+- (void) clearPole
+{
+    for (GameCardView* view in _kubiki) {
+        [view clearCard];
+        view.pointArray = [NSMutableArray array];
+        view.layer.borderWidth = 1.0f;
+        view.layer.borderColor = [UIColor blackColor].CGColor;
+        [view setBackgroundColor:[UIColor whiteColor]];
+        view.cardType = GameCardType_0;
+        [view setType:GameCardType_0 startRoad:0 rotate:NO];
+    }
+}
+- (void) gameOver
+{
+    UIAlertController* control = [UIAlertController alertControllerWithTitle:@"Конец" message:@"Игра окончена(" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction* actionOk = [UIAlertAction actionWithTitle:@"Еще сыграть" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [self clearPole];
+        [self getRandomStart];
+        [self genNextCard];
+        
+    }];
+    UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:@"Выйти" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+        [self dismissViewControllerAnimated:YES completion:nil];
+    }];
+    [control addAction:actionOk];
+    [control addAction:actionCancel];
+    [self presentViewController:control animated:YES completion:nil];
 }
 
 -(NSInteger) getRandomCard
 {
     if (!_cardArray) {
         _cardArray = [NSMutableArray array];
+    }
+    
+    if (_cardArray.count == 0) {
         while (_cardArray.count<35) {
             NSNumber* tempNum = [NSNumber numberWithInteger:arc4random()%35+1];
             if (![_cardArray containsObject:tempNum]) {
@@ -272,8 +317,9 @@
     }
     
     NSInteger index = arc4random()%_cardArray.count;
+    NSLog(@"getRandomCard index=%ld countArray=%i",(long)index,_cardArray.count);
     NSInteger obj = [[_cardArray objectAtIndex:index] integerValue];
-    [_cardArray removeObjectAtIndex:index];
+    //[_cardArray removeObjectAtIndex:index];
     
     return obj;
 }
@@ -282,6 +328,7 @@
 {
     //[self nextStepSetType:arc4random()%35+1];_selectCard
     [self nextStepSetType:_selectCard.cardType];
+    [_cardArray removeObject:[NSNumber numberWithInteger:_selectCard.cardType]];
 }
 
 - (void) setSelectedCard:(GameCardView *)selectCard
@@ -402,14 +449,19 @@
 
 - (void) genNextCard
 {
-    _card_1.pointArray = nil;
-    _card_2.pointArray = nil;
-    _card_3.pointArray = nil;
-    _selectCard.pointArray = nil;
+    _rotate = 0;
+    _card_1.pointArray = [NSMutableArray array];
+    _card_2.pointArray = [NSMutableArray array];
+    _card_3.pointArray = [NSMutableArray array];
+    _selectCard.pointArray = [NSMutableArray array];
     
+    _card_1.startRoad = startR;
     [_card_1 setType:[self getRandomCard] startRoad:startR rotate:_rotate];
+    _card_2.startRoad = startR;
     [_card_2 setType:[self getRandomCard] startRoad:startR rotate:_rotate];
+    _card_3.startRoad = startR;
     [_card_3 setType:[self getRandomCard] startRoad:startR rotate:_rotate];
+    _selectCard.startRoad = startR;
     [_selectCard setType:_card_1.cardType startRoad:startR rotate:_rotate];
     
     [self setSelectedCard:_card_1];

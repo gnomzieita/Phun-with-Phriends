@@ -88,6 +88,14 @@
 
 }
 
+- (NSInteger) getTo:(NSInteger)stR
+{
+    NSInteger temp1 = [[_pointArray lastObject] integerValue];
+    NSInteger temp2 = [[_pointArray objectAtIndex:_pointArray.count-2] integerValue];
+    
+    return temp1 == stR ? temp2 : temp1;
+}
+
 - (void)drawRect:(CGRect)rect {
     // Drawing code
     if (_cardTable) {
@@ -111,8 +119,16 @@
                 
                 if (moveIn == _startRoad || moveTo == _startRoad) {
                     
-                    [_pointArray addObject:[NSNumber numberWithInteger:moveTo]];
-                    [_pointArray addObject:[NSNumber numberWithInteger:moveIn]];
+                    if (![_pointArray containsObject:[NSNumber numberWithInteger:moveTo]]) {
+                        [_pointArray addObject:[NSNumber numberWithInteger:moveTo]];
+                    }
+                    if (![_pointArray containsObject:[NSNumber numberWithInteger:moveIn]]) {
+                        [_pointArray addObject:[NSNumber numberWithInteger:moveIn]];
+                    }
+                }
+                else if (moveTo == _startRoad)
+                {
+                    
                 }
                 [self moveIn:moveIn toPoint:moveTo];
             }
@@ -906,5 +922,11 @@
     CGPathRelease(path);
 
     
+}
+
+- (void) clearCard
+{
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGContextClearRect(context,self.frame);
 }
 @end

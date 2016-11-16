@@ -63,4 +63,7 @@ typedef NS_ENUM(NSInteger, GameCardType) {
 - (void)setType:(GameCardType)cType startRoad:(NSInteger)startRoad rotate:(NSInteger)rotate;
 - (void)drawRect;
 - (void)drawRect:(CGRect)rect;
+
+- (NSInteger) getTo:(NSInteger)stR;
+- (void) clearCard;
 @end
