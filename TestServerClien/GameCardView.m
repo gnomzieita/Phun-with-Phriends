@@ -462,7 +462,8 @@
 {
     NSLog(@"moveIn:%li toPoint%li",(long)inPoint,(long)toPoint);
     CGContextRef context = UIGraphicsGetCurrentContext();
-    //CGContextClearRect(context,self.frame);
+    NSLog(@"self = %@",self);
+    //CGContextClearRect(context, self.frame);
     CGMutablePathRef path = CGPathCreateMutable();
     
     const CGFloat color[] = { 0, 0, 1, 1 }; // Alpha should be 1, not 0!

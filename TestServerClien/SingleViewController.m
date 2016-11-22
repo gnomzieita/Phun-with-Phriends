@@ -46,28 +46,24 @@
 
 @implementation SingleViewController
 
-- (void) viewWillAppear:(BOOL)animated
+- (void) viewDidAppear:(BOOL)animated
 {
-    [super viewWillAppear:animated];
-    [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger: UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
-}
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    
-    //self.supportedInterfaceOrientations = UIInterfaceOrientationMaskLandscape;
-    [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger: UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
-    
+    [super viewDidAppear:animated];
+    //[[UIDevice currentDevice] setValue:[NSNumber numberWithInteger: UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
     
     arrayOfCard = [NSArray arrayWithObjects:_card_1,_card_2,_card_3, nil];
     // Do any additional setup after loading the view.
+    [self zapolnit];
+}
+
+- (void) zapolnit
+{
     _map = [NSMutableArray array];
     for (int y = 0; y<6; y++) {
         NSMutableArray* temprray = [NSMutableArray array];
         for (int x = 0; x<6; x++) {
-            GameCardView* view = [_kubiki objectAtIndex:y*6+x];
-            //GameCardView* view = [[GameCardView alloc] initWithFrame:tv.frame];
+            GameCardView* tv = [_kubiki objectAtIndex:y*6+x];
+            GameCardView* view = [[GameCardView alloc] initWithFrame:tv.frame];
             view.layer.borderWidth = 1.0f;
             view.layer.borderColor = [UIColor blackColor].CGColor;
             [view setBackgroundColor:[UIColor whiteColor]];
@@ -80,6 +76,14 @@
     [self getRandomStart];
     
     [self genNextCard];
+}
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    //self.supportedInterfaceOrientations = UIInterfaceOrientationMaskLandscape;
+    [[UIDevice currentDevice] setValue:[NSNumber numberWithInteger: UIDeviceOrientationLandscapeLeft] forKey:@"orientation"];
+    
 }
 
 - (void) getRandomStart
@@ -175,11 +179,10 @@
     if (tempView.pointArray) {
         
         GameCardView* view = [[GameCardView alloc] initWithFrame:tempView.frame];
+        NSLog(@"tempView.frame (x=%f:y=%f)",tempView.frame.origin.x,tempView.frame.origin.y);
         view.pointArray = tempView.pointArray;
         [view setType:cardType startRoad:startR rotate:tempView.rotate];
-        
         [tempView removeFromSuperview];
-        
         [_kubPole addSubview:view];
         tempView = view;
     }
@@ -273,14 +276,11 @@
 
 - (void) clearPole
 {
-    for (GameCardView* view in _kubiki) {
-        [view clearCard];
-        view.pointArray = [NSMutableArray array];
-        view.layer.borderWidth = 1.0f;
-        view.layer.borderColor = [UIColor blackColor].CGColor;
-        [view setBackgroundColor:[UIColor whiteColor]];
-        view.cardType = GameCardType_0;
-        [view setType:GameCardType_0 startRoad:0 rotate:NO];
+    for (int y = 0; y<6; y++) {
+        for (int x = 0; x<6; x++) {
+            GameCardView* tempCard = [[_map objectAtIndex:y] objectAtIndex:x];
+            [tempCard removeFromSuperview];
+        }
     }
 }
 - (void) gameOver
@@ -289,8 +289,7 @@
     
     UIAlertAction* actionOk = [UIAlertAction actionWithTitle:@"Еще сыграть" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         [self clearPole];
-        [self getRandomStart];
-        [self genNextCard];
+        [self zapolnit];
         
     }];
     UIAlertAction* actionCancel = [UIAlertAction actionWithTitle:@"Выйти" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
@@ -349,18 +348,33 @@
 
 - (void) setSelectedKub:(GameCardView *)selectKub
 {
-    for (GameCardView* tempCard in _kubiki) {
-        if (tempCard == selectKub) {
-            tempCard.layer.borderColor = [UIColor blueColor].CGColor;
-            tempCard.layer.borderWidth = 4.5f;
-            
-        }
-        else
-        {
-            tempCard.layer.borderColor = [UIColor blackColor].CGColor;
-            tempCard.layer.borderWidth = 1;
+    for (int y = 0; y<6; y++) {
+        for (int x = 0; x<6; x++) {
+            GameCardView* tempCard = [[_map objectAtIndex:y] objectAtIndex:x];
+            if (tempCard == selectKub) {
+                tempCard.layer.borderColor = [UIColor blueColor].CGColor;
+                tempCard.layer.borderWidth = 4.5f;
+                
+            }
+            else
+            {
+                tempCard.layer.borderColor = [UIColor blackColor].CGColor;
+                tempCard.layer.borderWidth = 1;
+            }
         }
     }
+//    for (GameCardView* tempCard in _kubiki) {
+//        if (tempCard == selectKub) {
+//            tempCard.layer.borderColor = [UIColor blueColor].CGColor;
+//            tempCard.layer.borderWidth = 4.5f;
+//            
+//        }
+//        else
+//        {
+//            tempCard.layer.borderColor = [UIColor blackColor].CGColor;
+//            tempCard.layer.borderWidth = 1;
+//        }
+//    }
 }
 - (IBAction)card_1_tap:(id)sender
 {
@@ -442,11 +456,6 @@
     }];
 }
 
-
-- (BOOL)shouldAutorotate {
-    return YES;
-}
-
 - (void) genNextCard
 {
     _rotate = 0;
@@ -467,4 +476,15 @@
     [self setSelectedCard:_card_1];
     [self setSelectedKub:(GameCardView *)[[_map objectAtIndex:startY] objectAtIndex:startX]];
 }
+
+
+- (BOOL)shouldAutorotate {
+    return YES;
+}
+
+- (UIInterfaceOrientationMask)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationMaskLandscape;
+}
+
 @end
